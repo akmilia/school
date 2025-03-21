@@ -84,7 +84,7 @@ const LendaingPage = () => {
                         </div>
                         <div className="convenience-item">
                             <h3>Просто</h3>
-                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud.</p>
+                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut laboe et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud.</p>
                         </div>
                         <div className="convenience-item">
                             <h3>Доступно везде и онлайн</h3>
