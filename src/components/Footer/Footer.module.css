@@ -1,0 +1,18 @@
+.footer {
+    padding: 20px;
+    text-align: center; 
+    background-color: #FFFFFF;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.footer_items {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.footer_items span {
+    margin: 0 15px;
+    text-decoration: none;
+    font-weight: bold;
+}
