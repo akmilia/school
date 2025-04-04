@@ -27,53 +27,21 @@ const LendaingPage = () => {
     const navigate = useNavigate();
     
     const Login = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const formData = new FormData(event.currentTarget);
-    const user_login = formData.get('login') as string;
-    const user_password = formData.get('password') as string; 
-    
-    
-    // const navigate = useNavigate();
-    
-    // const Login = async (event: React.FormEvent<HTMLFormElement>) => {
-    // event.preventDefault();
-    // const formData = new FormData(event.currentTarget);
-    // const user_login = formData.get('login') as string;
-    // const user_password = formData.get('password') as string;
-    
-    // try {
-    //     const response = await login(user_login, user_password);
-    //     if (response.data) {
-    //         localStorage.setItem('token', response.data.access_token);
-    //         localStorage.setItem('user_id', response.data.user_id);
-    //         localStorage.setItem('user_role', response.data.role);
-            
-    //         // Редирект в зависимости от роли
-    //         switch(response.data.role) {
-    //             case 1: // Админ
-    //                 navigate('/admin');
-    //                 break;
-    //             case 2: // Преподаватель
-    //                 navigate('/teacher');
-    //                 break;
-    //             case 3: // Ученик
-    //                 navigate('/student');
-    //                 break;
-    //             default:
-    //                 navigate('/');
-    //         }
-    //     }
-    // } catch (error) {
-    //     alert('Неверный логин или пароль');
-    // }
-    const response = await login(user_login, user_password);
-    if (response.status === 200) {
-        localStorage.setItem('token', response.data.access_token);
-        localStorage.setItem('user_role', response.data.role);
-        navigate('/schedule');
-    } else {
-        alert('Попробуйте еще раз')
-    }
+        event.preventDefault()
+        const formData = new FormData(event.currentTarget)
+        const user_login = formData.get('login') as string
+        const user_password = formData.get('password') as string
+        
+        try {
+          const response = await login(user_login, user_password)
+          if (response.status === 200) {
+            localStorage.setItem('token', response.data.access_token)
+            localStorage.setItem('user_role', response.data.role)
+            navigate('/schedule') // Все роли идут на одну страницу
+          }
+        } catch (error) {
+          alert('Неверный логин или пароль')
+        }
     }
 
     return (

@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import HeaderAdmin from "../../components/HeaderAdmin/Header";
 import UsersClass from "../../api/UsersClass";
-import AddUserModal from "../../components/UserModal/AddUserModal"; // Импортируем модальное окно
 import './UserPage.css'
 
 export const UsersPage = () => {
@@ -121,11 +120,6 @@ export const UsersPage = () => {
                 {renderUsersTable()}
             </main>
 
-            <AddUserModal
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-                onSubmit={handleAddUser}
-            />
         </div>
     )
 }

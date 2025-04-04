@@ -1,230 +1,107 @@
-import HeaderAdmin from "../../components/HeaderAdmin/Header"; 
 import { useEffect, useState } from "react";
-import AddScheduleModal from "../../components/Schedule/SheduleModal";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import CheduleApi from "../../api/ScheduleClass";
+import HeaderAdmin from "../../components/HeaderAdmin/Header"; 
 import "./SchedulePage.css";
 
+interface ScheduleItem {
+  day_of_week: number;
+  time: string;
+  subject_name: string;
+  group_name?: string;
+  teacher_name?: string;
+  cabinet: string;
+}
+
 const SchedulePage = () => {
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const baseUrl = import.meta.env.VITE_BASE_URL;
-    const access_token = localStorage.getItem("access_token");
-    const user_role = localStorage.getItem("user_role");
-
-    const [isLoading, setIsLoading] = useState(true);
-    const [teachers, setTeachers] = useState([]);
-    const [schedules, setSchedules] = useState([]);
-    const [subjects, setSubjects] = useState([]);
-    const [expandedSubjects, setExpandedSubjects] = useState({}); // Аккордеон
-
-    const [filteredType, setFilteredType] = useState<string | null>(null); // Состояние для фильтра типа предмета
-    const [isFilterOpen, setIsFilterOpen] = useState(false); // Состояние для открытия выпадающего фильтра
-
-    const getSubjects = async () => {
-        try {
-            const response = await axios.get(`${baseUrl}/subjects`, {
-                headers: { Authorization: "Bearer " + access_token },
-            });
-            setSubjects(response.data);
-        } catch (error) {
-            console.error("Ошибка при загрузке предметов:", error);
-        }
-    };
-
-    const getTeachers = async () => {
-        try {
-            const response = await axios.get(`${baseUrl}/teachers`, {
-                headers: { Authorization: "Bearer " + access_token },
-            });
-            setTeachers(response.data);
-        } catch (error) {
-            console.error(error);
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    const getSchedule = async () => {
-        try {
-            const response = await axios.get(`${baseUrl}/schedule`, {
-                headers: { Authorization: "Bearer " + access_token },
-            });
-            setSchedules(response.data);
-        } catch (error) {
-            console.error(error);
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    const handleAddSchedule = (data) => {
-        CheduleApi.postSchedule(data);
-    };
-
-    const formatTime = (dateString) => {
-        const date = new Date(dateString);
-        const hoursUTC3 = (date.getUTCHours() + 6) % 24;
-        const formattedHours = String(hoursUTC3).padStart(2, "0");
-        const formattedMinutes = String(date.getUTCMinutes()).padStart(2, "0");
-        return `${formattedHours}:${formattedMinutes}`;
-    };
-
-    const formatTeacherName = (teacher) => {
-        return `${teacher.surname} ${teacher.name[0]}.${teacher.paternity[0]}.`;
-    };
-
-    const formatType = (type) => {
-        switch (type) {
-            case "sport":
-                return "Спорт";
-            case "art":
-                return "Искусство";
-            case "free":
-                return "Бесплатно";
-            default:
-                return "Платно";
-        }
-    };
-
-    const groupScheduleByDay = () => {
-        const grouped = {};
-        schedules.forEach((day) => {
-            const dayName = day.day_name;
-            if (!grouped[dayName]) {
-                grouped[dayName] = {};
-            }
-            day.schedules.forEach((lesson) => {
-                const subjectId = lesson.subject.id;
-                if (!grouped[dayName][subjectId]) {
-                    grouped[dayName][subjectId] = {
-                        lessonInfo: lesson,
-                        dates: [],
-                    };
-                }
-                grouped[dayName][subjectId].dates.push(lesson.date_n_time);
-            });
+  const baseUrl = import.meta.env.VITE_baseUrl;
+  const user_role = localStorage.getItem("user_role");
+  const [isLoading, setIsLoading] = useState(true); 
+  const [error, setError] = useState('');
+  const [schedules, setSchedules] = useState<ScheduleItem[]>([]);
+  const navigate = useNavigate();
+  
+  useEffect(() => {
+    const fetchSchedule = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await axios.get(`${baseUrl}/api/schedule`, {
+          headers: { Authorization: `Bearer ${token}` }
         });
-        return grouped;
+        setSchedules(response.data);
+      } catch (err) {
+        setError('Ошибка при загрузке расписания');
+        console.error(err);
+      } finally {
+        setIsLoading(false);
+      }
     };
 
-    const groupDatesByMonth = (dates) => {
-        const grouped = {};
-        dates.forEach((dateString) => {
-            const date = new Date(dateString);
-            const month = date.toLocaleString("ru-RU", { month: "long" });
-            if (!grouped[month]) {
-                grouped[month] = [];
-            }
-            grouped[month].push(date.getDate());
-        });
-        return grouped;
-    };
+    fetchSchedule();
+  }, [baseUrl]);
 
-    const formatDateList = (dates) => {
-        const groupedByMonth = groupDatesByMonth(dates);
-        return Object.entries(groupedByMonth).map(([month, days]) => (
-            <div key={month} className="month-group">
-                <strong>{month}:</strong> {days.join(", ")}
-            </div>
-        ));
-    };
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user_role');
+    navigate('/main');
+  };
 
-    const toggleAccordion = (subjectId, dayName) => {
-        const key = `${subjectId}-${dayName}`;
-        setExpandedSubjects((prev) => ({
-            ...prev,
-            [key]: !prev[key],
-        }));
-    };
+  const daysOfWeek = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'];
 
-    // Фильтрация расписания по типу предмета
-    const filteredSchedules = filteredType === null 
-        ? schedules 
-        : schedules.filter((schedule) => {
-            return schedule.schedules.some((lesson) => {
-                return lesson.subject.type === filteredType;
-            });
-        });
+  return (
+    <div>
+      <HeaderAdmin />
+      <div className="container">
+        <h3>Ваше расписание</h3>
 
-    useEffect(() => {
-        getTeachers();
-        getSchedule();
-        getSubjects();
-    }, []);
+        <div className="schedule-container">
+          <header>
+            <h1>
+              {user_role === '3' ? 'Мое расписание' : 
+               user_role === '2' ? 'Мое преподавательское расписание' : 
+               'Расписание'}
+            </h1>
+            <button onClick={handleLogout} className="logout-button">Выйти</button>
+          </header>
 
-    return (
-        <div>
-            <HeaderAdmin />
-            <div className="container">
-                {user_role === "admin" && (
-                    <button onClick={() => setIsModalOpen(true)}>Добавить</button>
-                )}
-                <h3>Наши занятия и курсы</h3>
-
-                {/* Кнопка и фильтр по типу предмета */}
-                <div className="filter-container">
-                    <button onClick={() => setIsFilterOpen(prev => !prev)}>
-                        Фильтр по типу
-                    </button>
-                    {isFilterOpen && (
-                        <div className="filter-dropdown">
-                            <select
-                                onChange={(e) => {
-                                    const selectedType = e.target.value || null;
-                                    setFilteredType(selectedType);
-                                }}
-                                value={filteredType || ''}
-                            >
-                                <option value="">Все типы</option>
-                                <option value="sport">Спорт</option>
-                                <option value="art">Искусство</option>
-                                <option value="free">Бесплатно</option>
-                                <option value="paid">Платно</option>
-                            </select>
+          {isLoading ? (
+            <div>Загрузка расписания...</div>
+          ) : error ? (
+            <div className="error-message">{error}</div>
+          ) : (
+            <div className="schedule-grid">
+              {daysOfWeek.map((day, index) => {
+                const daySchedule = schedules.filter(item => item.day_of_week === index + 1);
+                
+                return (
+                  <div key={day} className="day-column">
+                    <h3>{day}</h3>
+                    {daySchedule.length > 0 ? (
+                      daySchedule.map((lesson, idx) => (
+                        <div key={`${day}-${idx}`} className="schedule-item">
+                          <div className="time">{lesson.time}</div>
+                          <div className="subject">{lesson.subject_name}</div>
+                          {user_role === '2' && lesson.group_name && (
+                            <div className="group">Группа: {lesson.group_name}</div>
+                          )}
+                          {user_role === '3' && lesson.teacher_name && (
+                            <div className="teacher">Преподаватель: {lesson.teacher_name}</div>
+                          )}
+                          <div className="cabinet">Каб. {lesson.cabinet}</div>
                         </div>
+                      ))
+                    ) : (
+                      <div className="no-classes">Нет занятий</div>
                     )}
-                </div>
-
-                <div className="schedule-container">
-                    {Object.entries(groupScheduleByDay()).map(([dayName, subjects]) => (
-                        <div key={dayName} className="schedule-day">
-                            <h4>{dayName}</h4>
-                            {Object.values(subjects).map(({ lessonInfo, dates }) => {
-                                // Применяем фильтрацию на уровне отображения
-                                const filteredLesson = filteredSchedules.find(schedule => schedule.schedules.some(lesson => lesson.subject.id === lessonInfo.subject.id));
-                                if (!filteredLesson) return null;
-
-                                const subjectId = lessonInfo.subject.id;
-                                const key = `${subjectId}-${dayName}`;
-                                const isExpanded = expandedSubjects[key];
-
-                                return (
-                                    <div key={subjectId} className="lesson-info">
-                                        <strong>{lessonInfo.subject.name}</strong> {lessonInfo.cabinet}{" "}
-                                        {formatTeacherName(lessonInfo.teacher)} {formatType(lessonInfo.subject.type)}{" "}
-                                        {formatTime(lessonInfo.date_n_time)}
-                                        <button onClick={() => toggleAccordion(subjectId, dayName)} className="accordion-button">
-                                            {isExpanded ? "Скрыть даты" : "Посмотреть"}
-                                        </button>
-                                        {isExpanded && <div className="dates-container">{formatDateList(dates)}</div>}
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    ))}
-                </div>
+                  </div>
+                );
+              })}
             </div>
-
-            <AddScheduleModal
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-                onSubmit={handleAddSchedule}
-                teachers={teachers}
-                subjects={subjects}
-            />
+          )}
         </div>
-    );
+      </div>
+    </div>
+  );
 };
-
 
 export default SchedulePage;
