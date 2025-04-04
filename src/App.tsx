@@ -30,8 +30,30 @@ function App() {
         <Route index element={<LendingPage /> } />
         <Route path='*' element={<LendingPage />} />
       </Routes>
-    </Suspense>
+    </Suspense> 
+  //      <BrowserRouter>
+  //      <Routes>
+  //          <Route path="/" element={<LendingPage />} />
+  //          <Route path="/admin" element={
+  //              <ProtectedRoute allowedRoles={[1]}>
+  //                  <AdminPage />
+  //              </ProtectedRoute>
+  //          } />
+  //          <Route path="/teacher" element={
+  //              <ProtectedRoute allowedRoles={[2]}>
+  //                  <TeacherPage />
+  //              </ProtectedRoute>
+  //          } />
+  //          <Route path="/student" element={
+  //              <ProtectedRoute allowedRoles={[3]}>
+  //                  <StudentPage />
+  //              </ProtectedRoute>
+  //          } />
+  //      </Routes>
+  //  </BrowserRouter>
   )
 }
 
 export default App
+
+   

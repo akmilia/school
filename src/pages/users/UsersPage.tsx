@@ -37,15 +37,15 @@ export const UsersPage = () => {
         }
     }
 
-    const handleAddUser = async (userData) => {
-        try {
-            const response = await UsersClass.addUser(userData); // Отправляем POST-запрос
-            setUsers([...users, response.data]); // Обновляем состояние
-            getUsers(); // Обновляем список пользователей после добавления
-        } catch (error) {
-            console.error("Ошибка при добавлении пользователя:", error);
-        }
-    };
+    // const handleAddUser = async (userData) => {
+    //     try {
+    //         const response = await UsersClass.addUser(userData); // Отправляем POST-запрос
+    //         setUsers([...users, response.data]); // Обновляем состояние
+    //         getUsers(); // Обновляем список пользователей после добавления
+    //     } catch (error) {
+    //         console.error("Ошибка при добавлении пользователя:", error);
+    //     }
+    // };
 
     useEffect(() => {
         getUsers();

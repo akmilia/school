@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { getSubjects } from "../../api/getSubjects"; // Предположим, что addSubject - это функция для POST-запроса
-import { addSubject } from "../../api/addSubject"; // Предположим, что addSubject - это функция для POST-запроса
 import HeaderAdmin from "../../components/HeaderAdmin/Header";
 import './SubjectPage.css'; // Импортируем файл стилей
 
@@ -22,16 +21,16 @@ const SubjectPage = () => {
         }));
     };
     
-    const handleAddSubject = async () => {
-        try {
-            const response = await addSubject(newSubject); // Отправляем POST-запрос
-            setSubjects(prevSubjects => [...prevSubjects, response.data]); // Обновляем состояние
-            setIsModalOpen(false); // Закрываем модальное окно
-            setNewSubject({ name: '', description: '', type: 'sport' }); // Сбрасываем форму
-        } catch (error) {
-            console.error("Ошибка при добавлении предмета:", error);
-        }
-    };
+    // const handleAddSubject = async () => {
+    //     try {
+    //         const response = await addSubject(newSubject); // Отправляем POST-запрос
+    //         setSubjects(prevSubjects => [...prevSubjects, response.data]); // Обновляем состояние
+    //         setIsModalOpen(false); // Закрываем модальное окно
+    //         setNewSubject({ name: '', description: '', type: 'sport' }); // Сбрасываем форму
+    //     } catch (error) {
+    //         console.error("Ошибка при добавлении предмета:", error);
+    //     }
+    // };
 
     useEffect(() => {
         const fetchSubjects = async () => {
@@ -82,7 +81,7 @@ const SubjectPage = () => {
                     </tbody>
                 </table>
 
-                {/* Модальное окно для добавления нового предмета */}
+                {/* Модальное окно для добавления нового предмета
                 {isModalOpen && (
                     <div className="modal">
                         <div className="modal-content">
@@ -122,7 +121,7 @@ const SubjectPage = () => {
                             <button onClick={() => setIsModalOpen(false)}>Отмена</button>
                         </div>
                     </div>
-                )}
+                )} */}
             </main>
         </div>
     );

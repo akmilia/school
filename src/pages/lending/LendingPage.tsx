@@ -29,16 +29,50 @@ const LendaingPage = () => {
     const Login = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
-    const user_login = formData.get('email') as string;
-    const user_password = formData.get('password') as string;
+    const user_login = formData.get('login') as string;
+    const user_password = formData.get('password') as string; 
     
+    
+    // const navigate = useNavigate();
+    
+    // const Login = async (event: React.FormEvent<HTMLFormElement>) => {
+    // event.preventDefault();
+    // const formData = new FormData(event.currentTarget);
+    // const user_login = formData.get('login') as string;
+    // const user_password = formData.get('password') as string;
+    
+    // try {
+    //     const response = await login(user_login, user_password);
+    //     if (response.data) {
+    //         localStorage.setItem('token', response.data.access_token);
+    //         localStorage.setItem('user_id', response.data.user_id);
+    //         localStorage.setItem('user_role', response.data.role);
+            
+    //         // Редирект в зависимости от роли
+    //         switch(response.data.role) {
+    //             case 1: // Админ
+    //                 navigate('/admin');
+    //                 break;
+    //             case 2: // Преподаватель
+    //                 navigate('/teacher');
+    //                 break;
+    //             case 3: // Ученик
+    //                 navigate('/student');
+    //                 break;
+    //             default:
+    //                 navigate('/');
+    //         }
+    //     }
+    // } catch (error) {
+    //     alert('Неверный логин или пароль');
+    // }
     const response = await login(user_login, user_password);
     if (response.status === 200) {
-    localStorage.setItem('token', response.data.access_token);
-    localStorage.setItem('user_role', response.data.role);
-    navigate('/schedule');
+        localStorage.setItem('token', response.data.access_token);
+        localStorage.setItem('user_role', response.data.role);
+        navigate('/schedule');
     } else {
-    alert('Попробуйте еще раз')
+        alert('Попробуйте еще раз')
     }
     }
 
@@ -65,12 +99,14 @@ const LendaingPage = () => {
                         </div>
 
                         <div className="login-form">
-                            <h1>НОВАЯ ШКОЛА</h1>
-                            <input type="email" placeholder="Эл. почта" />
-                            <input type="password" placeholder="Пароль" />
-                            <a href="#" className="forgot-password">Забыли пароль?</a>
-                            <button className="login-button">Войти</button>
-                            <button className="gosuslugi-button">Вход через Госуслуги</button>
+                            <h1>НОВАЯ ШКОЛА</h1> 
+                            <form onSubmit={Login}>
+                                <input  name="email" placeholder="Эл. почта" />
+                                <input type="password" name="password" placeholder="Пароль" /> 
+                                <a href="#" className="forgot-password">Забыли пароль?</a>
+                                <button type="submit" className="login-button">Войти</button> 
+                                <button className="gosuslugi-button">Вход через Госуслуги</button>
+                            </form>
                         </div>
                     </div>
                 </div>
