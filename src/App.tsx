@@ -12,20 +12,16 @@ function App() {
   const navigate = useNavigate()
   
   useEffect(() => {
-    const checkAuth = () => {
-      const token = localStorage.getItem('token')
-      const role = localStorage.getItem('user_role')
-      
-      if (!token) {
-        navigate('/main')
-      } else if (window.location.pathname === '/main' && token) {
-        // Если пользователь уже авторизован, перенаправляем в зависимости от роли
-        navigate('/schedule')
-      }
-    }
+    const token = localStorage.getItem('token');
+    const path = window.location.pathname;
     
-    checkAuth()
-  }, [navigate])
+    if (!token && path !== '/main') {
+        navigate('/main');
+    } else if (token && path === '/main') {
+        const role = localStorage.getItem('user_role');
+        navigate('/schedule');
+    }
+}, [navigate]);
 
   return (
     <Suspense fallback={<div>Loading...</div>}>

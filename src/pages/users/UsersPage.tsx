@@ -3,18 +3,34 @@ import HeaderAdmin from "../../components/HeaderAdmin/Header";
 import UsersClass from "../../api/UsersClass";
 import './UserPage.css'
 
+
 export const UsersPage = () => {
-    const [users, setUsers] = useState([]);
+    const [users, setUsers] = useState<User[]>([]);
+    const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [filteredRole, setFilteredRole] = useState<number | null>(null); // Состояние для фильтра роли
-    const [isFilterOpen, setIsFilterOpen] = useState(false); // Состояние для открытия выпадающего фильтра
+    const [filteredRole, setFilteredRole] = useState<number | null>(null);
+    const [isFilterOpen, setIsFilterOpen] = useState(false);
     const user_role = localStorage.getItem("user_role");
+
+    interface User {
+        idusers: number;
+        login: string;
+        full_name: string;
+        roles_idroles: number;
+        role?: string;
+      }
 
     const getUsers = async () => {
         try {
             const response = await UsersClass.getUsers();
             if (response && Array.isArray(response)) {
-                setUsers(response);
+                // Преобразуем данные, если нужно
+                const formattedUsers = response.map(user => ({
+                    ...user,
+                    idroles: user.roles_idroles, // Приводим к единому названию поля
+                    user_role: user.role // Используем название роли из ответа
+                }));
+                setUsers(formattedUsers);
             } else {
                 console.error("Неверные данные от API");
             }
@@ -23,103 +39,88 @@ export const UsersPage = () => {
         }
     }
 
-    const formatUserRole = (role_id) => {
-        switch (role_id) {
+    const formatUserRole = (idroles: number): string => {
+        switch (idroles) {
             case 1:
-                return <td>Администратор</td>;
+                return "Администратор";
             case 2:
-                return <td>Преподаватель</td>;
+                return "Преподаватель";
             case 3:
-                return <td>Ученик</td>;
+                return "Ученик";
             default:
-                return <td>Неизвестный</td>;
+                return "Неизвестный";
         }
     }
-
-    // const handleAddUser = async (userData) => {
-    //     try {
-    //         const response = await UsersClass.addUser(userData); // Отправляем POST-запрос
-    //         setUsers([...users, response.data]); // Обновляем состояние
-    //         getUsers(); // Обновляем список пользователей после добавления
-    //     } catch (error) {
-    //         console.error("Ошибка при добавлении пользователя:", error);
-    //     }
-    // };
 
     useEffect(() => {
         getUsers();
     }, []);
 
-    // Фильтрация пользователей по роли
-    const filteredUsers = filteredRole === null ? users : users.filter(user => user.role_id === filteredRole);
+    const filteredUsers = filteredRole === null 
+    ? users 
+    : users.filter(user => user.roles_idroles === filteredRole);
 
-    // Проверка наличия пользователей
-    const renderUsersTable = () => {
-        if (filteredUsers.length === 0) {
-            return <p>Нет пользователей для отображения.</p>;
-        }
-
-        return (
-            <table className="users-table">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Имя</th>
-                        <th>Фамилия</th>
-                        <th>Отчество</th>
-                        <th>День рождения</th>
-                        <th>Роль</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {filteredUsers.map((user, index) => (
-                        <tr key={index}>
-                            <td>{index + 1}</td>
-                            <td>{user?.name || 'Не указано'}</td>
-                            <td>{user?.surname || 'Не указана'}</td>
-                            <td>{user?.paternity || 'Не указано'}</td>
-                            <td>{user?.birthdate ? new Date(user.birthdate).toLocaleDateString() : 'Не указана'}</td>
-                            {formatUserRole(user?.role_id)}
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-        );
+const renderUsersTable = () => {
+    if (filteredUsers.length === 0) {
+        return <p>Нет пользователей для отображения.</p>;
     }
 
     return (
-        <div>
-            <HeaderAdmin />
+        <table className="users-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Логин</th>
+                    <th>ФИО</th>
+                    <th>Роль</th>
+                </tr>
+            </thead>
+            <tbody>
+                {filteredUsers.map((user, index) => (
+                    <tr key={user.idusers}>
+                        <td>{user.idusers}</td>
+                        <td>{user.login || 'Не указан'}</td>
+                        <td>{user.full_name || 'Не указано'}</td>
+                        <td>{user.role || formatUserRole(user.roles_idroles)}</td>
+                    </tr>
+                ))}
+            </tbody>
+        </table>
+    );
+}
 
-            <main className="main">
-                <h1>Пользователи</h1>
-                <div className='buttons'>
+return (
+    <div>
+        <HeaderAdmin />
+        <main className="main">
+            <h1>Пользователи</h1>
+            <div className='buttons'>
                 {user_role === "admin" && (
-                    <button onClick={() => setIsModalOpen(true)}>Добавить пользователя</button>
+                    <button onClick={() => setIsModalOpen(true)}>
+                        Добавить пользователя
+                    </button>
                 )}
-                    <div className="filter-container">
-                        <button onClick={() => setIsFilterOpen(prev => !prev)}>
-                            Фильтр
-                        </button>
-                        {isFilterOpen && (
-                            <div className="filter-dropdown">
-                                <select
-                                    onChange={(e) => setFilteredRole(Number(e.target.value))}
-                                    value={filteredRole || ''}
-                                >
-                                    <option value="">Все</option>
-                                    <option value="1">Администратор</option>
-                                    <option value="2">Преподаватель</option>
-                                    <option value="3">Ученик</option>
-                                </select>
-                            </div>
-                        )}
-                    </div>
+                <div className="filter-container">
+                    <button onClick={() => setIsFilterOpen(prev => !prev)}>
+                        Фильтр
+                    </button>
+                    {isFilterOpen && (
+                        <div className="filter-dropdown">
+                            <select
+                                onChange={(e) => setFilteredRole(Number(e.target.value))}
+                                value={filteredRole || ''}
+                            >
+                                <option value="">Все</option>
+                                <option value="1">Администратор</option>
+                                <option value="2">Преподаватель</option>
+                                <option value="3">Ученик</option>
+                            </select>
+                        </div>
+                    )}
                 </div>
-
-                {renderUsersTable()}
-            </main>
-
-        </div>
-    )
+            </div>
+            {renderUsersTable()}
+        </main>
+    </div>
+)
 }

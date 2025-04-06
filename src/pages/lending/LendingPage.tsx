@@ -42,6 +42,11 @@ const LendaingPage = () => {
         } catch (error) {
           alert('Неверный логин или пароль')
         }
+    } 
+    
+    const showMessage = (event: React.MouseEvent<HTMLAnchorElement>) => {
+        event.preventDefault();
+        alert('Эти данные хранятся у администратора системы. Пожалуйста, обратитесь к руководству вашей школы');
     }
 
     return (
@@ -69,9 +74,9 @@ const LendaingPage = () => {
                         <div className="login-form">
                             <h1>НОВАЯ ШКОЛА</h1> 
                             <form onSubmit={Login}>
-                                <input  name="email" placeholder="Эл. почта" />
+                                <input  name="login" placeholder="Логин" />
                                 <input type="password" name="password" placeholder="Пароль" /> 
-                                <a href="#" className="forgot-password">Забыли пароль?</a>
+                                <a href="#" onClick={showMessage} className="forgot-password">Забыли пароль?</a>
                                 <button type="submit" className="login-button">Войти</button> 
                                 <button className="gosuslugi-button">Вход через Госуслуги</button>
                             </form>

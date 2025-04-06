@@ -1,15 +1,16 @@
 import axios from 'axios'
-
 export const login = async (login: string, password: string) => {
-    const base_url = import.meta.env.VITE_BASE_URL;
     try {
-        const response = await axios.post(`${base_url}/auth/login`, {
-            // Полный путь http://localhost:5555/v1/auth/login
-            login,
-            password
-        })
-
-        return response.data
+        const response = await axios.post(
+            `${import.meta.env.VITE_BASE_URL}/login`, 
+            { login, password },
+            {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }
+        );
+        return response;
     }
     catch (error) {
         if (axios.isAxiosError(error)) {

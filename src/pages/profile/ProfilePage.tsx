@@ -18,7 +18,7 @@ const ProfilePage = () => {
     // Функция для получения данных пользователя
     const getProfileData = async () => {
         try {
-            const response = await axios.get('http://miwory.ru:5555/v1/profile', {
+            const response = await axios.get('http://miwory.ru:5555/profile', {
                 headers: {
                     Authorization: `Bearer ${access_token}`
                 },
