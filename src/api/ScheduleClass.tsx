@@ -13,7 +13,7 @@ class ScheduleApi {
         }
     }
 
-    public static postSchedule = async (formData) => {
+    public static postSchedule = async (formData: any) => {
         const base_url = import.meta.env.VITE_BASE_URL;
         const access_token = localStorage.getItem('access_token')
 

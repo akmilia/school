@@ -16,7 +16,7 @@ const HeaderAdmin = () => {
                     <li><a href="/schedule">Расписание</a></li>
                     <li><a href="/subjects">Занятия</a></li>
                     {
-                        user_role && user_role === 'admin' && (
+                        user_role && user_role === 'Преподаватель' && (
                             <li><a href="/users">Пользователи</a></li>
                         )
                     }

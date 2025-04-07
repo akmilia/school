@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import Footer from '../../components/Footer/Footer';
 import { login } from '../../api/login';
 import { useState } from 'react';
+import { useAuth } from '../../context/AuthContext';
 
 const LendaingPage = () => {
     const faqQuestions = [
@@ -25,24 +26,23 @@ const LendaingPage = () => {
     };
     
     const navigate = useNavigate();
-    
+    const { login: authLogin } = useAuth(); // Переименовываем, чтобы избежать конфликта имён
+    const [error, setError] = useState<string | null>(null); 
+
     const Login = async (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault()
-        const formData = new FormData(event.currentTarget)
-        const user_login = formData.get('login') as string
-        const user_password = formData.get('password') as string
+        event.preventDefault();
+        const formData = new FormData(event.currentTarget);
+        const user_login = formData.get('login') as string;
+        const user_password = formData.get('password') as string;
         
         try {
-          const response = await login(user_login, user_password)
-          if (response.status === 200) {
-            localStorage.setItem('token', response.data.access_token)
-            localStorage.setItem('user_role', response.data.role)
-            navigate('/schedule') // Все роли идут на одну страницу
-          }
+            const response = await login(user_login, user_password);
+            authLogin(response.data.access_token, response.data.role, response.data.user_id);
+            navigate('/schedule');
         } catch (error) {
-          alert('Неверный логин или пароль')
+            setError('Неверный логин или пароль');
         }
-    } 
+    };
     
     const showMessage = (event: React.MouseEvent<HTMLAnchorElement>) => {
         event.preventDefault();

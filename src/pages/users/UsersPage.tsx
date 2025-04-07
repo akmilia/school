@@ -2,16 +2,6 @@ import { useEffect, useState } from "react";
 import HeaderAdmin from "../../components/HeaderAdmin/Header";
 import UsersClass from "../../api/UsersClass";
 import './UserPage.css'
-
-
-export const UsersPage = () => {
-    const [users, setUsers] = useState<User[]>([]);
-    const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [filteredRole, setFilteredRole] = useState<number | null>(null);
-    const [isFilterOpen, setIsFilterOpen] = useState(false);
-    const user_role = localStorage.getItem("user_role");
-
     interface User {
         idusers: number;
         login: string;
@@ -20,17 +10,18 @@ export const UsersPage = () => {
         role?: string;
       }
 
+export const UsersPage = () => {
+    const [users, setUsers] = useState<User[]>([]);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [filteredRole, setFilteredRole] = useState<number | null>(null);
+    const [isFilterOpen, setIsFilterOpen] = useState(false);
+    const user_role = localStorage.getItem("user_role");
+
     const getUsers = async () => {
         try {
             const response = await UsersClass.getUsers();
             if (response && Array.isArray(response)) {
-                // Преобразуем данные, если нужно
-                const formattedUsers = response.map(user => ({
-                    ...user,
-                    idroles: user.roles_idroles, // Приводим к единому названию поля
-                    user_role: user.role // Используем название роли из ответа
-                }));
-                setUsers(formattedUsers);
+                setUsers(response);
             } else {
                 console.error("Неверные данные от API");
             }
@@ -38,6 +29,7 @@ export const UsersPage = () => {
             console.error("Ошибка при получении пользователей:", error);
         }
     }
+
 
     const formatUserRole = (idroles: number): string => {
         switch (idroles) {

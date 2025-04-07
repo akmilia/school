@@ -1,7 +1,14 @@
-import axios from 'axios'
-export const login = async (login: string, password: string) => {
+import axios from 'axios' 
+
+interface LoginResponse {
+    access_token: string;
+    role: string;
+    user_id: number;
+}
+
+export const login = async (login: string, password: string): Promise<{ data: LoginResponse }> => {
     try {
-        const response = await axios.post(
+        const response = await axios.post<LoginResponse>(
             `${import.meta.env.VITE_BASE_URL}/login`, 
             { login, password },
             {
@@ -11,11 +18,10 @@ export const login = async (login: string, password: string) => {
             }
         );
         return response;
-    }
-    catch (error) {
+    } catch (error) {
         if (axios.isAxiosError(error)) {
             throw new Error(error.response?.data?.detail || 'Ошибка авторизации');
         }
         throw new Error('Неизвестная ошибка');
     }
-}
+};

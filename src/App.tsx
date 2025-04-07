@@ -1,6 +1,6 @@
 import { Suspense, useEffect } from 'react'
 import './App.css'
-import { Routes, Route, useNavigate } from 'react-router-dom'
+import { Routes, Route, useNavigate  } from 'react-router-dom'
 
 import LendingPage from './pages/lending/LendingPage'
 import ProfilePage from './pages/profile/ProfilePage'
@@ -33,7 +33,7 @@ function App() {
         <Route path="/users" element={<UsersPage />} />
     
         <Route index element={<LendingPage />} />
-        <Route path='*' element={<LendingPage />} />
+        <Route path='*' element={<LendingPage />} /> 
       </Routes>
     </Suspense>
   )

@@ -1,0 +1,96 @@
+main {
+    width: 80%;
+    margin: 0 auto; 
+    margin-bottom: 30px;
+    justify-content: center; 
+    align-items: center;
+    padding: 20px;
+}  
+
+section {
+    width: 100%;
+    margin-bottom: 20px;
+    padding: 4%;
+    border: 1px solid #ccc; 
+    border-radius: 5px;
+    box-sizing: border-box; 
+}
+ 
+.profile_page {
+    width: 100%;
+}
+
+.profile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.profile_items {
+    display: flex;
+    width: 100%;
+    gap: 2%;
+}
+
+.profile_image {
+    width: 40%;
+    height: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+    background: #D9D9D9;
+}
+
+.profile_image img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+} 
+
+.profile_item {
+    width: 60%; 
+    padding: 10px;
+    box-sizing: border-box;
+    border: 1px solid #ccc; 
+    border-radius: 5px;
+}
+
+.profile_item h2 {
+    margin-top: 0;
+}
+
+.profile_data p {
+    margin-bottom: 10px;
+}
+
+.course { 
+    align-items: center; 
+    flex-direction: column;
+    display: flex;  
+}
+ 
+
+@media (max-width: 576px) {
+    .profile_image {
+        display: none;
+    } 
+
+    .profile_item {
+        width: 100%; 
+    }
+  }
+  
+
+.course_items { 
+    display: flex; 
+    flex-direction: column;
+    width: 100% 
+}
+ 
+.course_items h2{ 
+    align-self: center; 
+    margin: 0;
+    margin-top: 15px; 
+   
+} 
