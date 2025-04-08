@@ -2,79 +2,129 @@ import { useEffect, useState, useContext } from "react";
 import { getSubjects, getTypes, enrollToSubject } from "../../api/subjects";
 import HeaderAdmin from "../../components/HeaderAdmin/Header";
 import './SubjectPage.css';
-import { Button, Table, Form, Badge } from "react-bootstrap";
+import { Button, Table, Form, Badge, Spinner, Alert } from "react-bootstrap";
 import { AuthContext } from "../../context/AuthContext";
-
-interface Type {
-  type_id: number;
-  type_name: string;
-}
 
 interface Subject {
   subject_id: number;
   subject_name: string;
-  description: string;
-  types: Type[];
+  description: string; 
+  types: SubjectType[] 
 }
 
+interface SubjectType {
+  id: number;
+  type: string;
+}
 export const SubjectPage = () => {
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [filteredSubjects, setFilteredSubjects] = useState<Subject[]>([]);
-  const [types, setTypes] = useState<Type[]>([]);
+  const [types, setTypes] = useState<SubjectType[]>([]);
   const [selectedType, setSelectedType] = useState<number | 'all'>('all');
   const [sortField, setSortField] = useState<'subject_id' | 'subject_name'>('subject_name');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  
   const { user } = useContext(AuthContext);
-
   const isStudent = user?.role === 'Ученик';
   const isTeacher = user?.role === 'Преподаватель';
 
-  // Загрузка данных
   useEffect(() => {
     const fetchData = async () => {
+      setIsLoading(true);
+      setError(null);
+      
       try {
         const [subjectsResponse, typesResponse] = await Promise.all([
           getSubjects(),
           getTypes()
         ]);
         
-        setSubjects(subjectsResponse.data as Subject[]);
-        setTypes(typesResponse.data as unknown as Type[]);
-      } catch (error) {
-        console.error("Ошибка при загрузке данных:", error);
+        // Проверка и преобразование данных
+        const subjectsData = Array.isArray(subjectsResponse?.data) 
+          ? subjectsResponse.data 
+          : [];
+        const typesData = Array.isArray(typesResponse?.data) 
+          ? typesResponse.data 
+          : [];
+
+          setSubjects(subjectsData.map(subject => ({
+            subject_id: subject.subject_id,
+            subject_name: subject.subject_name,
+            description: subject.description || '',
+            types: Array.isArray(subject.types) 
+              ? subject.types.map((type: { id: any; name: any; }) => ({
+                  id: type.id,       // Исправлено на id
+                  type: type.name    // Исправлено на name
+                }))
+              : []
+          })));
+  
+          setTypes(typesData.map(type => ({
+            id: type.id,       // Исправлено на id
+            type: type.type    // Исправлено на name
+          }))); 
+
+        setFilteredSubjects(subjectsData);
+      } catch (err) {
+        console.error("Ошибка при загрузке данных:", err);
+        setError('Не удалось загрузить данные. Пожалуйста, попробуйте позже.');
+      } finally {
+        setIsLoading(false);
       }
     };
-
 
     fetchData();
   }, []);
 
-  // Фильтрация и сортировка
   useEffect(() => {
-    let result = [...subjects];
-    
-    if (selectedType !== 'all') {
-      result = result.filter(subject => 
-        subject.types.some(type => type.type_id === selectedType)
-      );
-    }
-    
-    result.sort((a, b) => {
-      const aValue = a[sortField];
-      const bValue = b[sortField];
+    const fetchData = async () => {
+      setIsLoading(true);
+      setError(null);
       
-      if (typeof aValue === 'string' && typeof bValue === 'string') {
-        return sortDirection === 'asc' 
-          ? aValue.localeCompare(bValue) 
-          : bValue.localeCompare(aValue);
+      try {
+        const [subjectsResponse, typesResponse] = await Promise.all([
+          getSubjects(),
+          getTypes()
+        ]);
+        
+        // Проверка и преобразование данных
+        const subjectsData = Array.isArray(subjectsResponse?.data) 
+          ? subjectsResponse.data 
+          : [];
+        const typesData = Array.isArray(typesResponse?.data) 
+          ? typesResponse.data 
+          : [];
+  
+        setSubjects(subjectsData.map(subject => ({
+          subject_id: subject.subject_id,
+          subject_name: subject.subject_name,
+          description: subject.description || '',
+          types: Array.isArray(subject.types) 
+            ? subject.types.map((type: any) => ({
+                id: type.id,  // учитываем оба варианта
+                type: type.type   // учитываем оба варианта
+              }))
+            : []
+        })));
+  
+        setTypes(typesData.map(type => ({
+          id: type.id,
+          type: type.type 
+        })));
+  
+        setFilteredSubjects(subjectsData);
+      } catch (err) {
+        console.error("Ошибка при загрузке данных:", err);
+        setError('Не удалось загрузить данные. Пожалуйста, попробуйте позже.');
+      } finally {
+        setIsLoading(false);
       }
-      return sortDirection === 'asc' 
-        ? (aValue as number) - (bValue as number) 
-        : (bValue as number) - (aValue as number);
-    });
-    
-    setFilteredSubjects(result);
-  }, [subjects, selectedType, sortField, sortDirection]);
+    };
+  
+    fetchData();
+  }, []);
 
   const handleEnroll = async (subjectId: number) => {
     if (!user || !isStudent) return;
@@ -82,8 +132,21 @@ export const SubjectPage = () => {
     try {
       await enrollToSubject(user.id, subjectId);
       alert('Вы успешно записаны на предмет!');
+      // Обновляем данные
       const response = await getSubjects();
-      setSubjects(response.data);
+      if (Array.isArray(response?.data)) {
+        setSubjects(response.data.map(subject => ({
+          subject_id: subject.subject_id,
+          subject_name: subject.subject_name,
+          description: subject.description || '',
+          types: Array.isArray(subject.types) 
+            ? subject.types.map((type: { id: any; type: any; }) => ({
+                id: type.id,
+                type: type.type
+              }))
+            : []
+        })));
+      }
     } catch (error) {
       console.error("Ошибка при записи:", error);
       alert('Ошибка при записи на предмет');
@@ -93,6 +156,24 @@ export const SubjectPage = () => {
   const toggleSortDirection = () => {
     setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
   };
+
+  if (isLoading) {
+    return (
+      <div className="d-flex justify-content-center mt-5">
+        <Spinner animation="border" role="status">
+          <span className="visually-hidden">Загрузка...</span>
+        </Spinner>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <Alert variant="danger" className="m-3">
+        {error}
+      </Alert>
+    );
+  }
 
   return (
     <div className="main">
@@ -105,11 +186,12 @@ export const SubjectPage = () => {
           <Form.Select 
             value={selectedType}
             onChange={(e) => setSelectedType(e.target.value === 'all' ? 'all' : Number(e.target.value))}
+            disabled={isLoading}
           >
             <option value="all">Все типы</option>
             {types.map(type => (
-              <option key={type.type_id} value={type.type_id}>
-                {type.type_name}
+              <option key={`type-${type.id}`} value={type.type}>
+                {type.type}
               </option>
             ))}
           </Form.Select>
@@ -120,6 +202,7 @@ export const SubjectPage = () => {
             variant="outline-secondary"
             onClick={() => setSortField('subject_name')}
             active={sortField === 'subject_name'}
+            disabled={isLoading}
           >
             Сортировать по названию
           </Button>
@@ -127,12 +210,14 @@ export const SubjectPage = () => {
             variant="outline-secondary"
             onClick={() => setSortField('subject_id')}
             active={sortField === 'subject_id'}
+            disabled={isLoading}
           >
             Сортировать по ID
           </Button>
           <Button 
             variant="outline-primary"
             onClick={toggleSortDirection}
+            disabled={isLoading}
           >
             {sortDirection === 'asc' ? '↑' : '↓'}
           </Button>
@@ -150,32 +235,47 @@ export const SubjectPage = () => {
           </tr>
         </thead>
         <tbody>
-          {filteredSubjects.map((subject) => (
-            <tr key={subject.subject_id}>
-              <td>{subject.subject_id}</td>
-              <td>{subject.subject_name}</td>
-              <td>{subject.description || '—'}</td>
-              <td>
-                <div className="subject-types">
-                  {subject.types.map(type => (
-                    <Badge key={type.type_id} bg="info" className="type-badge">
-                      {type.type_name}
-                    </Badge>
-                  ))}
-                </div>
-              </td>
-              {isStudent && (
+          {filteredSubjects.length > 0 ? (
+            filteredSubjects.map((subject) => (
+              <tr key={`subject-${subject.subject_id}`}>
+                <td>{subject.subject_id}</td>
+                <td>{subject.subject_name}</td>
+                <td>{subject.description || '—'}</td>
                 <td>
-                  <Button
-                    variant="primary"
-                    onClick={() => handleEnroll(subject.subject_id)}
-                  >
-                    Записаться
-                  </Button>
+                  <div className="subject-types">
+                    {subject.types.map(type => (
+                      <Badge 
+                        key={`type-${subject.subject_id}-${type.id}`} 
+                        bg="info" 
+                        className="type-badge"
+                      >
+                        {type.type}
+                      </Badge>
+                    ))}
+                  </div>
                 </td>
-              )}
+                {isStudent && (
+                  <td>
+                    <Button
+                      variant="primary"
+                      onClick={() => handleEnroll(subject.subject_id)}
+                      disabled={isLoading}
+                    >
+                      Записаться
+                    </Button>
+                  </td>
+                )}
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan={isStudent ? 5 : 4} className="text-center">
+                {selectedType === 'all' 
+                  ? 'Нет доступных предметов' 
+                  : 'Нет предметов выбранного типа'}
+              </td>
             </tr>
-          ))}
+          )}
         </tbody>
       </Table>
     </div>

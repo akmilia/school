@@ -23,11 +23,11 @@ function App() {
     const path = location.pathname;
     const isProtectedRoute = protectedRoutes.some(route => path.startsWith(route));
 
-    if (!user && isProtectedRoute) {
-      navigate('/main', { replace: true });
-    } else if (user && path === '/main') {
-      navigate('/schedule', { replace: true });
-    }
+    // if (!user && isProtectedRoute) {
+    //   navigate('/main', { replace: true });
+    // } else if (user && path === '/main') {
+    //   navigate('/schedule', { replace: true });
+    // }
   }, [user, isInitialized, navigate, location]);
 
   if (!isInitialized) {

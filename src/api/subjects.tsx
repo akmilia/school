@@ -1,24 +1,21 @@
 import axios from 'axios';
 const base_url = import.meta.env.VITE_BASE_URL;
 
-// Типы для TypeScript
 interface Subject {
-  id: number;
-  name: string;
-  description: string;
-  id_type: number;
-  type?: string; // Опционально, если приходит с сервера
+  subject_id: number;
+  subject_name: string;
+  description: string; 
+  types: SubjectType[] 
 }
 
-interface Type {
+interface SubjectType {
   id: number;
-  name: string;
-  description?: string;
+  type: string;
 }
 
 export interface ApiSubjectType {
-  type_id: number;
-  type_name: string;
+  id: number;
+  type: string;
 }
 
 export interface ApiSubject {
@@ -38,7 +35,7 @@ interface ApiError {
   message: string;
   status?: number;
   data?: any;
-}
+} 
 
 // Общая функция для обработки ошибок
 const handleError = (error: unknown): ApiError => {
@@ -52,7 +49,7 @@ const handleError = (error: unknown): ApiError => {
   return { message: 'Unknown error occurred' };
 };
 
-export const getTypes = async (): Promise<{ data: Type[] }> => {
+export const getTypes = async (): Promise<{ data: SubjectType[] }> => {
   const access_token = localStorage.getItem('access_token');
   
   try {
@@ -86,25 +83,6 @@ export const getSubjects = async (): Promise<ApiResponse<Subject[]> | ApiError> 
   }
 };
 
-// Получение расписания пользователя
-export const fetchUserSchedule = async (userId: number): Promise<ApiResponse<any> | ApiError> => {
-  const access_token = localStorage.getItem('access_token');
-
-  if (!access_token) {
-    return { message: 'No access token found' };
-  }
-
-  try {
-    const response = await axios.get(`${base_url}/api/schedule/user/${userId}`, {
-      headers: {
-        'Authorization': `Bearer ${access_token}`
-      }
-    });
-    return response;
-  } catch (error) {
-    return handleError(error);
-  }
-};
 
 // Запись на предмет
 export const enrollToSubject = async (
