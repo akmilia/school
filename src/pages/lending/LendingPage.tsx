@@ -38,7 +38,7 @@ const LendaingPage = () => {
         try {
             const response = await login(user_login, user_password);
             authLogin(response.data.access_token, response.data.role, response.data.user_id);
-            navigate('/schedule');
+            navigate('/subjects');
         } catch (error) {
             setError('Неверный логин или пароль');
         }

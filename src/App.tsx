@@ -1,42 +1,58 @@
-import { Suspense, useEffect } from 'react'
-import './App.css'
-import { Routes, Route, useNavigate  } from 'react-router-dom'
-
-import LendingPage from './pages/lending/LendingPage'
-import ProfilePage from './pages/profile/ProfilePage'
-import SubjectPage from './pages/subject/SubjectPage'
-import SchedulePage from './pages/schedule/SchedulePage'
-import { UsersPage } from './pages/users/UsersPage'
+import { Suspense, useEffect } from 'react';
+import './App.css';
+import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from './context/AuthContext';
+import LendingPage from './pages/lending/LendingPage';
+import ProfilePage from './pages/profile/ProfilePage';
+import SubjectPage from './pages/subject/SubjectPage';
+import SchedulePage from './pages/schedule/SchedulePage';
+import { UsersPage } from './pages/users/UsersPage';
+import LoadingSpinner from './components/LoadingSpinner'; // Создайте этот компонент
 
 function App() {
-  const navigate = useNavigate()
-  
+  const { user, isInitialized } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // Защищённые маршруты
+  const protectedRoutes = ['/profile', '/subjects', '/schedule', '/users'];
+
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    const path = window.location.pathname;
-    
-    if (!token && path !== '/main') {
-        navigate('/main');
-    } else if (token && path === '/main') {
-        const role = localStorage.getItem('user_role');
-        navigate('/schedule');
+    if (!isInitialized) return; // Ждём инициализации auth состояния
+
+    const path = location.pathname;
+    const isProtectedRoute = protectedRoutes.some(route => path.startsWith(route));
+
+    if (!user && isProtectedRoute) {
+      navigate('/main', { replace: true });
+    } else if (user && path === '/main') {
+      navigate('/schedule', { replace: true });
     }
-}, [navigate]);
+  }, [user, isInitialized, navigate, location]);
+
+  if (!isInitialized) {
+    return <LoadingSpinner fullScreen />; // Показываем загрузку пока проверяется auth состояние
+  }
 
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<LoadingSpinner fullScreen />}>
       <Routes>
         <Route path='/main' element={<LendingPage />} />
-        <Route path="/profile" element={<ProfilePage />} />
-        <Route path="/subjects" element={<SubjectPage />} />
-        <Route path="/schedule" element={<SchedulePage />} />
-        <Route path="/users" element={<UsersPage />} />
-    
+        {user && (
+          <>
+            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/subjects" element={<SubjectPage />} />
+            <Route path="/schedule" element={<SchedulePage />} />
+            {user.role === 'admin' && (
+              <Route path="/users" element={<UsersPage />} />
+            )}
+          </>
+        )}
         <Route index element={<LendingPage />} />
-        <Route path='*' element={<LendingPage />} /> 
+        <Route path='*' element={<LendingPage />} />
       </Routes>
     </Suspense>
-  )
+  );
 }
 
-export default App
+export default App;

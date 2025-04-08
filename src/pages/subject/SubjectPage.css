@@ -1,6 +1,41 @@
-.main {
-    padding: 20px;
+h1 {
+    margin-bottom: 20px;
 }
+  
+  .sorting-container {
+    margin-bottom: 20px;
+    width: 250px;
+  }
+  
+  .sorting-dropdown {
+    width: 100%;
+  }
+  
+.subjects-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+  
+.subjects-table th,
+.subjects-table td {
+    padding: 12px;
+    border: 1px solid #ddd;
+    text-align: left;
+  }
+  
+.subjects-table th {
+    background-color: #f9f9f9;
+    font-weight: bold;
+  }
+  
+.subjects-table tbody tr:nth-child(even) {
+    background-color: #f2f2f2;
+  }
+  
+.subjects-table tbody tr:hover {
+    background-color: #e0e0e0;
+  }
 
 .subjects-table {
     width: 100%;
