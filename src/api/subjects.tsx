@@ -49,7 +49,7 @@ const handleError = (error: unknown): ApiError => {
   return { message: 'Unknown error occurred' };
 };
 
-export const getTypes = async (): Promise<{ data: SubjectType[] }> => {
+export const getTypes = async (): Promise<SubjectType[]> => {
   const access_token = localStorage.getItem('access_token');
   
   try {
@@ -58,11 +58,12 @@ export const getTypes = async (): Promise<{ data: SubjectType[] }> => {
         'Authorization': `Bearer ${access_token}`
       }
     });
-    return response;
+    return response.data; // Возвращаем только data
   } catch (error) {
     throw new Error('Failed to fetch types');
   }
-};
+}; 
+
 // Получение предметов
 export const getSubjects = async (): Promise<ApiResponse<Subject[]> | ApiError> => {
   const access_token = localStorage.getItem('access_token');

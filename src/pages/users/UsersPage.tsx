@@ -39,8 +39,6 @@ export const UsersPage = () => {
                 return "Преподаватель";
             case 3:
                 return "Ученик";
-            default:
-                return "Неизвестный";
         }
     }
 
