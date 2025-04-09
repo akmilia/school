@@ -72,17 +72,24 @@ export const getSubjects = async (): Promise<ApiResponse<Subject[]> | ApiError> 
   }
 
   try {
+    console.log('Making request to:', `${base_url}/subjects`);
     const response = await axios.get<Subject[]>(`${base_url}/subjects`, {
       headers: {
-        'Authorization': `Bearer ${access_token}`
-      }
+        'Authorization': `Bearer ${access_token}`,
+        'Content-Type': 'application/json'
+      },
+      timeout: 5000 // Таймаут 5 секунд
     });
     return response;
   } catch (error) {
+    console.error('Full error details:', error);
+    if (axios.isAxiosError(error)) {
+      console.error('Error config:', error.config);
+      console.error('Error response:', error.response);
+    }
     return handleError(error);
   }
 };
-
 
 // Запись на предмет
 export const enrollToSubject = async (

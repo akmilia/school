@@ -28,7 +28,8 @@ export const SubjectPage = () => {
   
   const { user } = useContext(AuthContext);
   const isStudent = user?.role === 'Ученик';
-  const isTeacher = user?.role === 'Преподаватель';
+  const isTeacher = user?.role === 'Преподаватель'; 
+  console.log('Current token:', localStorage.getItem('access_token'));
 
   useEffect(() => {
     const fetchData = async () => {
@@ -54,9 +55,9 @@ export const SubjectPage = () => {
             subject_name: subject.subject_name,
             description: subject.description || '',
             types: Array.isArray(subject.types) 
-              ? subject.types.map((type: { id: any; name: any; }) => ({
+              ? subject.types.map((type: { id: any; type: any; }) => ({
                   id: type.id,       // Исправлено на id
-                  type: type.name    // Исправлено на name
+                  type: type.type    // Исправлено на 
                 }))
               : []
           })));
@@ -87,7 +88,11 @@ export const SubjectPage = () => {
         const [subjectsResponse, typesResponse] = await Promise.all([
           getSubjects(),
           getTypes()
-        ]);
+        ]); 
+
+        console.log('Subjects response:', subjectsResponse);
+        console.log('Types response:', typesResponse);
+  
         
         // Проверка и преобразование данных
         const subjectsData = Array.isArray(subjectsResponse?.data) 

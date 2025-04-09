@@ -11,7 +11,13 @@ interface AuthContextType {
   login: (token: string, role: string, userId: number) => void;
   logout: () => void;
   isInitialized: boolean;
-}
+} 
+
+// const [user, setUser] = useState<User | null>(() => {
+//   const token = localStorage.getItem('access_token');
+//   const role = localStorage.getItem('user_role');
+//   return token && role ? { id: 0, role, token } : null; // id можно получить из токена
+// });
 
 export const AuthContext = createContext<AuthContextType>({
   user: null,
@@ -25,7 +31,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const login = (token: string, role: string, userId: number) => {
     setUser({ id: userId, role, token });
-    localStorage.setItem('token', token);
+    localStorage.setItem('access_token', token); 
     localStorage.setItem('user_role', role);
   };
 
