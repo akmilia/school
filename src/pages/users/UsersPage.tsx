@@ -39,7 +39,7 @@ export const UsersPage = () => {
             <HeaderAdmin />
             <main className="main">
                 <h1>Преподаватели</h1>
-                <div className="search-container">
+                <div className="search-container" >
                     <input
                         type="text"
                         placeholder="Поиск по ФИО"
