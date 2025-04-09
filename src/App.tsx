@@ -43,9 +43,7 @@ function App() {
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/subjects" element={<SubjectPage />} />
             <Route path="/schedule" element={<SchedulePage />} />
-            {user.role === 'admin' && (
-              <Route path="/users" element={<UsersPage />} />
-            )}
+            <Route path="/users" element={<UsersPage />} />
           </>
         )}
         <Route index element={<LendingPage />} />
