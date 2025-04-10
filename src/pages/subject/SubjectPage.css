@@ -15,9 +15,9 @@ h1 {
     width: 100%;
     border-collapse: collapse;
     margin-top: 20px;
-  }
-  
-.subjects-table th,
+  } 
+
+.subjects-table th, 
 .subjects-table td {
     padding: 12px;
     border: 1px solid #ddd;
@@ -61,6 +61,58 @@ h1 {
 
 .subjects-table tbody tr:hover {
     background-color: #e0e0e0;
+}
+
+.groups-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+} 
+
+.groups-table th, 
+.groups-table td {
+  padding: 12px;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+
+.groups-table th {
+  background-color: #f9f9f9;
+  font-weight: bold;
+}
+
+.groups-table tbody tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+.groups-table tbody tr:hover {
+  background-color: #e0e0e0;
+}
+
+.groups-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.groups-table th,
+.groups-table td {
+  padding: 12px;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+
+.groups-table th {
+  background-color: #f9f9f9;
+  font-weight: bold;
+}
+
+.groups-table tbody tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+.groups-table tbody tr:hover {
+  background-color: #e0e0e0;
 }
 
 .modal {

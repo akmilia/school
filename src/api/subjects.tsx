@@ -146,34 +146,67 @@ export const getSubjects = async (): Promise<ApiResponse<Subject[]> | ApiError> 
   }
 };
 
-export const handleEnrollGroup = async (groupId: number) => {
+// export const handleEnrollGroup = async (idgroups: number) => {
+//   const access_token = localStorage.getItem('access_token');
+//   if (!access_token) {
+//     console.error('No access token found');
+//     return;
+//   }
+
+//   try {
+//     const response = await axios.post(`${base_url}/enroll/group`, {
+//       idgroups: idgroups
+//     }, {
+//       headers: {
+//         'Authorization': `Bearer ${access_token}`
+//       }
+//     });
+
+//     console.log('Успешно записались в группу:', response.data);
+//     return response.data;
+//   } catch (error) {
+//     console.error('Ошибка при записи в группу:', error);
+//     if (axios.isAxiosError(error)) {
+//       console.error('Error response:', error.response);
+//       if (error.response?.status === 400) {
+//         if (error.response.data.detail === 'Already enrolled') {
+//           throw new Error('Вы уже записаны в эту группу');
+//         } else if (error.response.data.detail === 'Group is full') {
+//           throw new Error('Группа заполнена');
+//         }
+//       }
+//     }
+//     throw error;
+//   }
+// }; 
+export const handleEnrollGroup = async (idgroups: number) => {
   const access_token = localStorage.getItem('access_token');
+  
   if (!access_token) {
-    console.error('No access token found');
-    return;
+    throw new Error('Требуется авторизация');
   }
 
   try {
-    const response = await axios.post(`${base_url}/enroll/group`, {
-      groupId: groupId
-    }, {
-      headers: {
-        'Authorization': `Bearer ${access_token}`
-      }
-    });
-
-    console.log('Успешно записались в группу:', response.data);
-  } catch (error) {
-    console.error('Ошибка при записи в группу:', error);
-    if (axios.isAxiosError(error)) {
-      console.error('Error response:', error.response);
-      if (error.response?.status === 400) {
-        if (error.response.data.detail === 'Already enrolled') {
-          alert('Вы уже записаны в эту группу');
-        } else if (error.response.data.detail === 'Group is full') {
-          alert('Группа заполнена');
+    const response = await axios.post(
+      `${base_url}/enroll/group`,
+      { idgroups }, // Отправляем как объект с полем group_id
+      {
+        headers: {
+          'Authorization': `Bearer ${access_token}`,
+          'Content-Type': 'application/json'
         }
       }
+    );
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      if (error.response?.status === 401) {
+        // Очищаем невалидный токен
+        localStorage.removeItem('access_token');
+        throw new Error('Сессия истекла. Пожалуйста, войдите снова.');
+      }
+      throw new Error(error.response?.data?.detail || 'Ошибка сервера');
     }
+    throw new Error('Неизвестная ошибка');
   }
 };
