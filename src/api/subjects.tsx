@@ -7,6 +7,11 @@ interface Subject {
   description: string; 
   types: SubjectType[] 
 }
+ 
+interface Group { 
+  idgroups: number;
+  name: string
+}
 
 interface SubjectType {
   id: number;
@@ -23,6 +28,11 @@ export interface ApiSubject {
   subject_name: string;
   description: string;
   types: ApiSubjectType[];
+} 
+
+export interface ApiGroup { 
+  idgroups: number;
+  name: string
 }
 
 interface ApiResponse<T> {
@@ -62,7 +72,51 @@ export const getTypes = async (): Promise<SubjectType[]> => {
   } catch (error) {
     throw new Error('Failed to fetch types');
   }
-}; 
+};  
+
+
+export const getGroups = async (): Promise<ApiResponse<ApiGroup[]> | ApiError> => {
+  const access_token = localStorage.getItem('access_token');
+
+  if (!access_token) {
+    return { message: 'No access token found' };
+  }
+
+  try {
+    console.log('Making request to:', `${base_url}/groups`);
+    
+    const response = await axios.get<ApiGroup[]>(`${base_url}/groups`, {
+      headers: {
+        'Authorization': `Bearer ${access_token}`,
+        'Content-Type': 'application/json'
+      },
+      timeout: 5000 // Таймаут на запрос — 5 секунд
+    });
+
+    console.log('Response received:', response.data);
+
+    return {
+      data: response.data,
+      status: response.status,
+      statusText: response.statusText
+    };
+  } catch (error) {
+    console.error('Full error details:', error);
+
+    if (axios.isAxiosError(error)) {
+      console.error('Error config:', error.config);
+      console.error('Error response:', error.response);
+
+      return {
+        message: error.response?.data?.message || 'Failed to fetch groups',
+        status: error.response?.status,
+        data: error.response?.data
+      };
+    }
+
+    return { message: 'An unexpected error occurred' };
+  }
+};
 
 // Получение предметов
 export const getSubjects = async (): Promise<ApiResponse<Subject[]> | ApiError> => {
@@ -92,30 +146,34 @@ export const getSubjects = async (): Promise<ApiResponse<Subject[]> | ApiError> 
   }
 };
 
-// Запись на предмет
-export const enrollToSubject = async (
-  userId: number, 
-  subjectId: number
-): Promise<ApiResponse<any> | ApiError> => {
+export const handleEnrollGroup = async (groupId: number) => {
   const access_token = localStorage.getItem('access_token');
-
   if (!access_token) {
-    return { message: 'No access token found' };
+    console.error('No access token found');
+    return;
   }
 
   try {
-    const response = await axios.post(
-      `${base_url}/api/schedule/enroll`,
-      { userId, subjectId },
-      {
-        headers: {
-          'Authorization': `Bearer ${access_token}`,
-          'Content-Type': 'application/json'
+    const response = await axios.post(`${base_url}/enroll/group`, {
+      groupId: groupId
+    }, {
+      headers: {
+        'Authorization': `Bearer ${access_token}`
+      }
+    });
+
+    console.log('Успешно записались в группу:', response.data);
+  } catch (error) {
+    console.error('Ошибка при записи в группу:', error);
+    if (axios.isAxiosError(error)) {
+      console.error('Error response:', error.response);
+      if (error.response?.status === 400) {
+        if (error.response.data.detail === 'Already enrolled') {
+          alert('Вы уже записаны в эту группу');
+        } else if (error.response.data.detail === 'Group is full') {
+          alert('Группа заполнена');
         }
       }
-    );
-    return response;
-  } catch (error) {
-    return handleError(error);
+    }
   }
 };
