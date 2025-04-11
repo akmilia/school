@@ -34,7 +34,15 @@
 
 .search-container { 
    background-color: #f9f9f9ea;
-}
+} 
+
+.search-container input{ 
+    background-color: #f9f9f9ea;
+ } 
+
+ .search-container input ::placeholder{ 
+    background-color: #f9f9f9ea;
+ }
 
 .filter-dropdown {
     position: absolute;

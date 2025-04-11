@@ -73,7 +73,12 @@ export const SubjectPage = () => {
                         type: type.type
                     }))
                 })));
-
+                
+                setTypes(typesData.map(type => ({
+                    id: type.id,
+                    type: type.type
+                }))); 
+                
                 const sortedGroups = [...groupsData].sort((a, b) => 
                     a.name.localeCompare(b.name)
                 );
@@ -149,27 +154,6 @@ export const SubjectPage = () => {
 
         setFilteredGroups(sorted);
     }, [groups, groupSortField, groupSortDirection, isLoading]);
-    // const handleEnroll = async (subjectId: number) => {
-    //     if (!user || !isStudent) return;
-
-    //     try {
-    //         await enrollToSubject(user.id, subjectId);
-    //         alert('Вы успешно записаны на предмет!');
-    //         const response = await getSubjects();
-    //         setSubjects(response.data.map((subject: { subject_id: any; subject_name: any; description: any; types: { id: any; type: any; }[]; }) => ({
-    //             subject_id: subject.subject_id,
-    //             subject_name: subject.subject_name,
-    //             description: subject.description || '',
-    //             types: subject.types.map((type: { id: any; type: any; }) => ({
-    //                 id: type.id,
-    //                 type: type.type
-    //             }))
-    //         })));
-    //     } catch (error) {
-    //         console.error("Ошибка при записи:", error);
-    //         alert('Ошибка при записи на предмет');
-    //     }
-    // };
 
     const toggleSortDirection = () => {
         setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
