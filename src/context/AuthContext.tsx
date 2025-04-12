@@ -24,23 +24,34 @@ export const AuthContext = createContext<AuthContextType>({
   login: () => {},
   logout: () => {},
   isInitialized: false,
-});
+}); 
+
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<User | null>(() => {
+    const token = localStorage.getItem('access_token');
+    const role = localStorage.getItem('user_role');
+    const userId = localStorage.getItem('user_id');
+    return token && role && userId 
+      ? { id: Number(userId), role, token } 
+      : null;
+  });
 
   const login = (token: string, role: string, userId: number) => {
-    setUser({ id: userId, role, token });
+    const userData = { id: userId, role, token };
+    setUser(userData);
     localStorage.setItem('access_token', token); 
     localStorage.setItem('user_role', role);
+    localStorage.setItem('user_id', userId.toString());
   };
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem('token');
+    localStorage.removeItem('access_token');  // Было 'token'
     localStorage.removeItem('user_role');
-  }; 
-  
+    localStorage.removeItem('user_id');
+};
+  // Остальное без изменений
   const isInitialized = true;
 
   return (

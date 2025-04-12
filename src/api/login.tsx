@@ -1,10 +1,11 @@
-import axios from 'axios' 
+import axios from 'axios'  
 
 interface LoginResponse {
     access_token: string;
-    role: string;
+    role: string; 
+    token_type: string;
     user_id: number;
-}
+} 
 
 export const login = async (login: string, password: string): Promise<{ data: LoginResponse }> => {
     try {

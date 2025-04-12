@@ -27,8 +27,17 @@ const LendaingPage = () => {
     
     const navigate = useNavigate();
     const { login: authLogin } = useAuth(); // Переименовываем, чтобы избежать конфликта имён
-    const [error, setError] = useState<string | null>(null); 
+    const [error, setError] = useState<string | null>(null);  
 
+
+    interface LoginResponse {
+        access_token: string;
+        role: string;
+        token_type: string; // Добавляем это поле
+        user_id: number;
+    }
+    
+    // В компоненте LendingPage.tsx:
     const Login = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const formData = new FormData(event.currentTarget);
@@ -37,12 +46,16 @@ const LendaingPage = () => {
         
         try {
             const response = await login(user_login, user_password);
-            authLogin(response.data.access_token, response.data.role, response.data.user_id);
-            navigate('/users');
+            authLogin(
+                response.data.access_token, 
+                response.data.role, 
+                response.data.user_id
+            );
+            navigate('/profile');
         } catch (error) {
             setError('Неверный логин или пароль');
         }
-    };
+    }; 
     
     const showMessage = (event: React.MouseEvent<HTMLAnchorElement>) => {
         event.preventDefault();

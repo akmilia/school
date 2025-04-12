@@ -16,20 +16,19 @@ function App() {
 
   // Защищённые маршруты
   const protectedRoutes = ['/profile', '/subjects', '/schedule', '/users'];
-
   useEffect(() => {
-    if (!isInitialized) return; // Ждём инициализации auth состояния
-
+    if (!isInitialized) return;
+  
     const path = location.pathname;
     const isProtectedRoute = protectedRoutes.some(route => path.startsWith(route));
-
-    // if (!user && isProtectedRoute) {
-    //   navigate('/main', { replace: true });
-    // } else if (user && path === '/main') {
-    //   navigate('/schedule', { replace: true });
-    // }
-  }, [user, isInitialized, navigate, location]);
-
+  
+    if (!user && isProtectedRoute) {
+      navigate('/main', { replace: true });
+    } else if (user && path === '/main') {
+      navigate('/profile', { replace: true });
+    }
+  }, [user, isInitialized, navigate, location]); 
+  
   if (!isInitialized) {
     return <LoadingSpinner fullScreen />; // Показываем загрузку пока проверяется auth состояние
   }

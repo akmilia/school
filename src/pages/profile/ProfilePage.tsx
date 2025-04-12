@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useAuth } from '../../context/AuthContext'; // Добавьте этот импорт
 import Header from '../../components/HeaderAdmin/Header';
 import cl from './Profile.module.css';
 import axios from 'axios';
@@ -7,7 +8,7 @@ interface ProfileData {
     idusers: number;
     full_name: string; 
     login: string;  
-    birthdate: string; // Изменено с Date на string для отображения
+    birthdate: string;
     idroles: number; 
 }
 
@@ -20,39 +21,43 @@ const ProfilePage = () => {
         idusers: 0,
         full_name: '', 
         login: '', 
-        birthdate: '', // Изменено с Date на string
+        birthdate: '',
         idroles: 0
-    });
-    const [courses, setCourses] = useState<CourseData[]>([]);
-    const access_token = localStorage.getItem('access_token');
-    const base_url = import.meta.env.VITE_BASE_URL; 
+    }); 
 
-    // Функция для получения данных пользователя
+    const { user } = useAuth();
+    const [courses, setCourses] = useState<CourseData[]>([]);
+    const base_url = import.meta.env.VITE_BASE_URL;
+    
     const getProfileData = async () => {
+        if (!user) return;
+        
         try { 
             const [profileResponse, coursesResponse] = await Promise.all([
                 axios.get(`${base_url}/current-user`, {
                     headers: {
-                        Authorization: `Bearer ${access_token}`
+                        Authorization: `Bearer ${user.token}`
                     },
                 }),
                 axios.get(`${base_url}/user-courses`, {
                     headers: {
-                        Authorization: `Bearer ${access_token}`
+                        Authorization: `Bearer ${user.token}`
                     },
                 })
             ]);
-            
+
+            // Устанавливаем данные профиля
             const profileData = profileResponse.data;
             setProfile({
                 idusers: profileData.idusers,
                 full_name: profileData.full_name,
+                login: profileData.login,
                 birthdate: profileData.birthdate ? 
                     new Date(profileData.birthdate).toLocaleDateString() : 'Не указана',
-                login: profileData.login,
                 idroles: profileData.idroles,
             });
 
+            // Устанавливаем курсы
             setCourses(coursesResponse.data);
         } catch (error) {
             console.error("Ошибка при получении данных профиля:", error);
@@ -61,9 +66,8 @@ const ProfilePage = () => {
 
     useEffect(() => {
         getProfileData();
-    }, []);
+    }, [user]);
 
-    // Преобразуем роль в строку
     const formatRole = (idroles: number) => {
         switch (idroles) {
             case 1:
