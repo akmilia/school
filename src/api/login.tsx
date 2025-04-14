@@ -1,4 +1,5 @@
 import axios from 'axios'  
+import { AuthContext } from '../context/AuthContext';
 
 interface LoginResponse {
     access_token: string;
@@ -6,6 +7,19 @@ interface LoginResponse {
     token_type: string;
     user_id: number;
 } 
+
+// Автоматическое обновление токена при 401 ошибке
+axios.interceptors.response.use(
+    response => response,
+    async error => {
+      if (error.response.status === 401) {
+        await refreshToken();
+        return axios(error.config);
+      }
+      return Promise.reject(error);
+    }
+  );
+  
 
 export const login = async (login: string, password: string): Promise<{ data: LoginResponse }> => {
     try {
