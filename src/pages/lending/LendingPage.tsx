@@ -1,8 +1,9 @@
 import { useNavigate } from 'react-router-dom';
 import Footer from '../../components/Footer/Footer';
-import { login } from '../../api/login';
-import { useState } from 'react';
+import { authService } from '../../api/login'; 
 import { useAuth } from '../../context/AuthContext';
+import { useState } from 'react';
+
 
 const LendaingPage = () => {
     const faqQuestions = [
@@ -26,36 +27,37 @@ const LendaingPage = () => {
     };
     
     const navigate = useNavigate();
-    const { login: authLogin } = useAuth(); // Переименовываем, чтобы избежать конфликта имён
-    const [error, setError] = useState<string | null>(null);  
+    const { login: authLogin } = useAuth();
+    const [error, setError] = useState<string | null>(null);
+    const [isLoading, setIsLoading] = useState(false);
 
-
-    interface LoginResponse {
-        access_token: string;
-        role: string;
-        token_type: string; // Добавляем это поле
-        user_id: number;
-    }
-    
-    // В компоненте LendingPage.tsx:
-    const Login = async (event: React.FormEvent<HTMLFormElement>) => {
+    const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        const formData = new FormData(event.currentTarget);
-        const user_login = formData.get('login') as string;
-        const user_password = formData.get('password') as string;
+        setError(null);
+        setIsLoading(true);
         
+        const formData = new FormData(event.currentTarget);
+        const credentials = {
+            login: formData.get('login') as string,
+            password: formData.get('password') as string
+        };
+
         try {
-            const response = await login(user_login, user_password);
-            authLogin(
-                response.data.access_token, 
-                response.data.role, 
-                response.data.user_id
-            );
+            // Используем новый сервис авторизации
+            const tokenData = await authService.login(credentials.login, credentials.password);
+            
+            // Сохраняем данные через AuthContext
+            authLogin(tokenData);
+            
+            // Перенаправляем на защищенную страницу
             navigate('/profile');
-        } catch (error) {
-            setError('Неверный логин или пароль');
+        } catch (error: any) { // Явно указываем тип any для error
+            console.error('Login error:', error);
+            setError(error.message || 'Неверный логин или пароль');
+        } finally {
+            setIsLoading(false);
         }
-    }; 
+    };
     
     const showMessage = (event: React.MouseEvent<HTMLAnchorElement>) => {
         event.preventDefault();
@@ -85,14 +87,48 @@ const LendaingPage = () => {
                         </div>
 
                         <div className="login-form">
-                            <h1>НОВАЯ ШКОЛА</h1> 
-                            <form onSubmit={Login}>
-                                <input  name="login" placeholder="Логин" />
-                                <input type="password" name="password" placeholder="Пароль" /> 
-                                <a href="#" onClick={showMessage} className="forgot-password">Забыли пароль?</a>
-                                <button type="submit" className="login-button">Войти</button> 
-                                <button className="gosuslugi-button">Вход через Госуслуги</button>
-                            </form>
+                            <h1>НОВАЯ ШКОЛА</h1>  
+                            {error && <div className="error-message">{error}</div>} 
+
+                             <form onSubmit={handleLogin}>
+                    <input 
+                        name="login" 
+                        placeholder="Логин" 
+                        required
+                        disabled={isLoading}
+                    />
+                    <input 
+                        type="password" 
+                        name="password" 
+                        placeholder="Пароль" 
+                        required
+                        disabled={isLoading}
+                    />
+                    
+                    <a 
+                        href="#" 
+                        onClick={showMessage} 
+                        className="forgot-password"
+                    >
+                        Забыли пароль?
+                    </a>
+                    
+                    <button 
+                        type="submit" 
+                        className="login-button"
+                        disabled={isLoading}
+                    >
+                        {isLoading ? 'Вход...' : 'Войти'}
+                    </button>
+                    
+                    <button 
+                        type="button" 
+                        className="gosuslugi-button"
+                        disabled={isLoading}
+                    >
+                        Вход через Госуслуги
+                    </button>
+                </form>
                         </div>
                     </div>
                 </div>
