@@ -5,23 +5,23 @@
   z-index: 1000;
   background-color: #fff;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-} 
+  height: 80px; /* Добавлена фиксированная высота для десктопа */
+}
 
 .icon {
-  width: 36px; /* Увеличение размера иконки */
-  height: 36px; /* Увеличение размера иконки */
+  width: 36px;
+  height: 36px;
   object-fit: contain;
 }
 
-
 .header { 
-  padding: 20px 0; 
-  width: 100%;
-  padding: 20px 0; /* Добавлены отступы сверху и снизу */
+  padding: 20px 40px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 30px;
+  position: relative;
+  height: 100%;
 }
 
 .headerLeft {
@@ -30,9 +30,10 @@
 
 .headerTitle {
   margin: 0;
-  font-size: 36px; /* Увеличен размер шрифта */
+  font-size: 36px;
   font-weight: 700;
-  color: #000; 
+  color: #000;
+  transition: opacity 0.3s;
 }
 
 .headerTitle a {
@@ -62,7 +63,7 @@
   color: #000;
   text-decoration: none;
   font-weight: 600;
-  font-size: 20px; /* Увеличен размер шрифта */
+  font-size: 20px;
   padding: 5px 0;
   position: relative;
   transition: color 0.2s;
@@ -109,45 +110,125 @@
   background-color: #f0f0f0;
 }
 
+/* Мобильное меню */
+.menuButton {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+  z-index: 1001;
+}
+
+.menuIcon {
+  width: 36px;
+  height: 36px;
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+}
+
+/* Адаптация */
+@media (max-width: 1024px) {
+  .header {
+    padding: 20px;
+  }
+}
 
 @media (max-width: 768px) {
   .header {
-      flex-direction: column;
-      gap: 15px;
-      padding: 10px 0; /* Уменьшены отступы на мобильных устройствах */
-  }
-
-  .headerLeft,
-  .nav,
-  .headerRight {
-      width: 100%;
-      justify-content: center;
-  }
-
-  .navList {
-      gap: 15px;
-  }
-
-  .headerRight {
-      justify-content: center;
+    padding: 20px; /* Увеличено padding для большего пространства */
+    height: 70px; /* Увеличена высота header'а */
   }
 
   .headerTitle {
-      font-size: 28px; /* Уменьшен размер шрифта на мобильных устройствах */
+    font-size: 28px;
   }
 
   .navLink {
-      font-size: 16px; /* Уменьшен размер шрифта на мобильных устройствах */
+    font-size: 18px;
+  }
+}
+@media (max-width: 640px) {
+  .headerWrapper {
+    height: 70px; /* Увеличена высота для мобильных */
+  }
+  
+  .header {
+    padding: 15px 20px;
+    height: 100%;
+  }
+
+  .headerTitle {
+    opacity: 0;
+    position: absolute;
+    pointer-events: none;
+  }
+
+  .menuButton {
+    display: block;
+    position: absolute;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%); /* Центрирование кнопки меню */
+  }
+
+  .nav {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100vh;
+    width: 70%;
+    max-width: 300px;
+    background-color: #fff;
+    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    z-index: 1000;
+    padding-top: 90px; /* Увеличено для большего пространства */
+  }
+
+  .navOpen {
+    transform: translateX(0);
+  }
+
+  .navList {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0 20px;
+    gap: 20px;
+  }
+
+  .headerRight {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
   }
 }
 
 @media (max-width: 480px) {
-  .navList {
-      flex-wrap: wrap;
-      gap: 10px;
+  .headerWrapper {
+    height: 70px; /* Фиксированная высота для самых маленьких экранов */
+  }
+  
+  .header {
+    padding: 15px;
+  }
+
+  .menuIcon {
+    width: 32px;
+    height: 32px;
   }
 
   .navLink {
-      font-size: 14px;
+    font-size: 16px;
   }
 }

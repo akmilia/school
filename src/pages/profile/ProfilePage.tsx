@@ -2,9 +2,9 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import Header from '../../components/HeaderAdmin/Header';
 import cl from './Profile.module.css';
-import { authService } from '../../api/login';  
+import api from '../../api/login';  
 
-interface UserProfile {
+interface UserResponseSchemaBirthdate {
   idusers: number;
   full_name: string;
   login: string;
@@ -14,7 +14,7 @@ interface UserProfile {
 }
 
 const ProfilePage = () => {
-  const [profile, setProfile] = useState<UserProfile>({
+  const [profile, setProfile] = useState<UserResponseSchemaBirthdate>({
     idusers: 0,
     full_name: '', 
     login: '', 
@@ -29,46 +29,42 @@ const ProfilePage = () => {
   const [error, setError] = useState<string | null>(null);
   
   const fetchProfileData = async () => {
-    if (!user) {
-      setError('Пользователь не авторизован');
-      setLoading(false);
-      return;
-    }
-    
-    try { 
-      setLoading(true);
-      setError(null);
-      
-      const [profileData, coursesData] = await Promise.all([
-        authService.getCurrentUser(),
-        authService.getUserCourses()
+    try {
+      const [profileResponse, coursesResponse] = await Promise.all([
+        api.get('/api/current-user'),
+        api.get('/api/user-courses')
       ]);
-  
+      
+      if (!profileResponse.data || !coursesResponse.data) {
+        throw new Error('Invalid response data');
+      }
+      
       setProfile({
-        idusers: profileData.idusers,
-        full_name: profileData.full_name || 'Не указано',
-        login: profileData.login,
-        birthdate: profileData.birthdate 
-        ? new Date(profileData.birthdate).toLocaleDateString() 
-        : 'Не указана',
-        id_roles: profileData.id_roles,
-        user_role: profileData.user_role
+        idusers: profileResponse.data.idusers,
+        full_name: profileResponse.data.full_name || 'Не указано',
+        login: profileResponse.data.login,
+        birthdate: profileResponse.data.birthdate
+          ? new Date(profileResponse.data.birthdate).toLocaleDateString()
+          : 'Не указана',
+        id_roles: profileResponse.data.id_roles,
+        user_role: profileResponse.data.user_role
       });
   
-      setCourses(coursesData || []);
+      setCourses(coursesResponse.data || []);
+      setLoading(false);
     } catch (err: any) {
-      console.error("Ошибка при получении данных профиля:", err);
-      setError('Не удалось загрузить данные профиля');
-      if (err.status === 401) {
+      console.error("Fetch error:", err);
+      if (err.response?.status === 401) {
         logout();
       }
-    } finally {
+      setError('Ошибка загрузки данных');
       setLoading(false);
     }
   };
 
   useEffect(() => {
     fetchProfileData();
+    // eslint-disable-next-line
   }, [user]);
 
   if (loading) {

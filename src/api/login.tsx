@@ -1,8 +1,6 @@
 import axios from 'axios';
 import { TokenResponse } from '../context/AuthContext';
 
-const API_BASE_URL = import.meta.env.VITE_BASE_URL;
-
 interface ApiError {
   message: string;
   status?: number;
@@ -13,17 +11,17 @@ interface UserResponseSchemaBithdate {
   idusers: number;
   full_name: string;
   login: string;
-  birthdate: string;
+  birthdate: Date;
   id_roles: number;
   user_role: string;
 }
 
-// Базовый экземпляр axios
 const api = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: import.meta.env.VITE_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
+  withCredentials: true  // Add this for cookie-based auth
 });
 
 /**

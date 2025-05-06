@@ -1,29 +1,364 @@
-body {
-  font-family: Arial, sans-serif;
-  margin: 0;
-  background-color: #f9f9f9ea; 
-  margin-top: 0; /* Ensure no bottom margin */
-  padding-top: 0; 
+.main-content {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
 }
 
-.top-section {
+/* Hero Section */
+.hero-section {
+  padding: 40px 0;
+}
+
+.hero-container {
   display: flex;
-  flex-direction: column; 
-  align-items: center; 
-  margin-top: 0; /* Ensure no bottom margin */
-  padding-top: 0; 
+  align-items: center;
+  justify-content: space-between;
+  gap: 40px;
+}
+
+.hero-image {
+  flex: 1;
+  text-align: center;
+}
+
+.hero-image img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+.login-container {
+  flex: 1;
+  max-width: 450px;
+  padding: 30px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.login-container h2 {
+  text-align: center;
+  margin-bottom: 25px;
+  font-size: 28px;
+  color: #333;
+}
+
+.login-form input {
+  width: 100%;
+  padding: 12px 15px;
+  margin-bottom: 15px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 16px;
+  transition: border-color 0.3s;
+}
+
+.login-form input:focus {
+  border-color: #555;
+  outline: none;
+}
+
+.forgot-password {
+  display: block;
+  text-align: right;
+  margin-bottom: 20px;
+  color: #555;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.forgot-password:hover {
+  text-decoration: underline;
+}
+
+.login-button {
+  width: 100%;
+  padding: 12px;
+  background-color: #333;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 10px;
+  transition: background-color 0.3s;
+}
+
+.login-button:hover {
+  background-color: #555;
+}
+
+.login-button:disabled {
+  background-color: #999;
+  cursor: not-allowed;
+}
+
+.secondary-button {
+  width: 100%;
+  padding: 12px;
+  background-color: #f0f0f0;
+  color: #333;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.secondary-button:hover {
+  background-color: #e0e0e0;
+}
+
+.error-message {
+  color: #d32f2f;
+  background-color: #fde8e8;
+  padding: 10px 15px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+
+/* Features Section */
+.features-section {
+  padding: 60px 0;
+}
+
+.features-section h2 {
+  text-align: center;
+  margin-bottom: 40px;
+  font-size: 32px;
+  color: #333;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+}
+
+.feature-card {
+  padding: 25px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.feature-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+.feature-card h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  font-size: 20px;
+  color: #333;
+}
+
+.feature-card p {
+  color: #666;
+  line-height: 1.6;
+}
+
+/* Schools Section */
+.schools-section {
+  padding: 60px 0;
+}
+
+.schools-section h2 {
+  text-align: center;
+  margin-bottom: 40px;
+  font-size: 32px;
+  color: #333;
+}
+
+.schools-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+}
+
+.school-card {
+  text-align: center;
+  padding: 20px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.school-card img {
+  max-width: 100px;
+  height: auto;
+  margin-bottom: 15px;
+}
+
+.school-card p {
+  font-size: 18px;
+  color: #333;
+  margin: 0;
+}
+
+/* FAQ Section */
+.faq-section {
+  padding: 60px 0;
+}
+
+.faq-section h2 {
+  text-align: center;
+  margin-bottom: 40px;
+  font-size: 32px;
+  color: #333;
+}
+
+.faq-list {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.faq-item {
+  margin-bottom: 15px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+.faq-question {
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+}
+
+.faq-question h4 {
+  margin: 0;
+  font-size: 18px;
+  color: #333;
+}
+
+.faq-toggle {
+  font-size: 24px;
+  font-weight: bold;
+  color: #555;
+}
+
+.faq-answer {
+  padding: 0 20px 20px;
+  color: #666;
+  line-height: 1.6;
+}
+
+.faq-answer p {
+  margin: 0;
+}
+
+/* Responsive Styles */
+@media (max-width: 1024px) {
+  .features-grid,
+  .schools-grid {
+      grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-container {
+      flex-direction: column;
+  }
+  
+  .login-container {
+      max-width: 100%;
+      width: 100%;
+  }
+  
+  .features-grid,
+  .schools-grid {
+      grid-template-columns: 1fr;
+      gap: 20px;
+  }
+  
+  .feature-card,
+  .school-card {
+      width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .main-content {
+      padding: 20px 15px;
+  }
+  
+  .hero-section,
+  .features-section,
+  .schools-section,
+  .faq-section {
+      padding: 40px 0;
+  }
+  
+  .login-container {
+      padding: 20px;
+  }
+  
+  .faq-question {
+      padding: 15px;
+  }
+  
+  .faq-question h4 {
+      font-size: 16px;
+  }
+  
+  .faq-answer {
+      padding: 0 15px 15px;
+  }
+} 
+
+/* Header Styles */
+.header-wrapper {
+  width: 100%;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background-color: #fff;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  height: 80px;
 }
 
 .header {
-  background-color: #FFFFFF;
-  padding: 10px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  margin-bottom: -5px;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  height: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+}
+
+.header-left {
+  flex: 1;
+}
+
+.header-title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  color: #000;
+}
+
+.header-title a {
+  color: #000;
+  text-decoration: none;
 }
 
 .nav {
   display: flex;
   justify-content: center;
+  flex: 2;
 }
 
 .nav-list {
@@ -31,278 +366,96 @@ body {
   padding: 0;
   margin: 0;
   display: flex;
-}
-
-.nav-list li {
-  margin: 0 20px;
+  gap: 30px;
 }
 
 .nav-list li a {
+  color: #000;
   text-decoration: none;
-  color: #333;
-  font-weight: bold;
+  font-weight: 600;
+  font-size: 18px;
+  padding: 5px 0;
+  position: relative;
 }
 
-.main{
-  justify-content: center; 
-  padding: 20px;
-  margin: 0 auto; 
-  width: 80%; 
-  margin: 0 auto; 
-  margin-bottom: 30px; 
+.nav-list li a::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color: #000;
+  transition: width 0.3s;
 }
 
-/**/ 
-.start {
-  display: flex; 
-  align-items: center;
-  justify-content: space-around;  
-  margin: 0 auto;
-  width: 100%; 
-}
-
-.image-container {
-  flex: 1; 
-  text-align: center;
-  margin-top: 20px;
-}
-
-.image-container img {
-  max-width: 100%;
-  height: auto;
-}
-
-.login-form {
-  flex: 1;
-  max-width: 50%;
-  padding: 20px;
-  margin-top: 20px;
-}
-
-.login-form h1 {
-  text-align: center;
-  margin-bottom: 30px;
-}
-
-.login-form input {
+.nav-list li a:hover::after {
   width: 100%;
-  padding: 10px;
-  background: transparent;
-  margin-bottom: 15px;
-  border: 1px solid #ddd; 
-  color: #000000;
-  border-radius: 5px; 
-  box-sizing: border-box; 
 }
 
-.login-form .forgot-password {
-  width: 100%;
-  display: block;
-  text-align: right;
-  margin-bottom: 20px;
-  color: #000000;
-  text-decoration: none; 
-}
-
-.login-form button {
-  width: 100%;
-  padding: 12px; 
+/* Mobile Menu Styles */
+.menu-button {
+  display: none;
+  background: none;
   border: none;
-  border-radius: 5px;
-  color: #fff;
-  font-weight: bold;
   cursor: pointer;
-  margin-bottom: 10px;
-  background-color: #333;
-  box-sizing: border-box;  
+  padding: 5px;
+  z-index: 1001;
 }
 
-.login-form .gosuslugi-button {
-  background-color: #FFFFFF;
-  color: #333;
-  width: 100%;
-  box-sizing: border-box; 
+.menu-icon {
+  width: 32px;
+  height: 32px;
 }
 
-@media (max-width: 576px) {
-  .start {
-      flex-direction: column; 
-      align-items: center; 
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+}
+
+@media (max-width: 768px) {
+  .menu-button {
+    display: block;
   }
 
-  .header{
-		width :100% !important ; /* Or any other specific percentage/width value */
-		padding-left :10px !important ;
-		padding-right :10px !important ;
-	} 
-  
-  .image-container {
-      display: block; 
-      max-width: 80%; 
-      margin-bottom: 20px; 
+  .nav {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100vh;
+    width: 70%;
+    max-width: 300px;
+    background-color: #fff;
+    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    z-index: 1000;
+    padding-top: 80px;
+  }
+
+  .nav-open {
+    transform: translateX(0);
+  }
+
+  .nav-list {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0 20px;
+    gap: 20px;
   }
 }
 
-/* With Us Section ///////////////////////////////////////*/
-
-.with-us {
-  text-align: center; 
-  align-items: center;
-  margin-bottom: 15px; 
-  display: flex; 
-  justify-content: space-around; 
-  flex-direction: column; 
-  width: 100%;
-}
-
-.convenience-items {
-  display: flex;
-  justify-content: space-around;
-  margin-top: 20px; 
-}
-
-.convenience-item {
-  padding: 20px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  max-height: 250px; 
-  overflow-y: auto;
-} 
-
-
-@media(max-width :576px){ 
-
-     .with-us ,  
-     .convenience-items {
-      flex-direction :column ;
-      align-items:center;
-    }
-     .convenience-item {
-      display:block ;
-      max-width :80%;
-    }
-     
-}
-
-/* Schools Section */
-.schools {
-  text-align: center;
-  align-items: center;
-  margin-bottom: 15px; 
-  display: flex; 
-  justify-content: space-around; 
-  flex-direction: column;
-  width: 100%;
-}
-
-.school-items {
-  display: flex;
-  justify-content: space-around;
-  margin-top: 20px; 
-}
-
-.school-item {
-  text-align: center; 
-  margin: 25px;
-  width: 55%; 
-}
-
-.school-item img {
-  max-width: 70%;
-  height: auto;
-}
-
-
-@media(max-width :576px){ 
-
-  .schools ,  
-  .school-items {
-   flex-direction :column ;
-   align-items:center;
- }
-  .school-item {
-   display:block ;
-   max-width :80%;
- }
+@media (max-width: 480px) {
+  .header-title {
+    font-size: 20px;
+  }
   
+  .nav-list li a {
+    font-size: 16px;
+  }
 }
-
-/* FAQ Section */
-
-.faq{ 
-  text-align: left;
-  align-items: center;
-  margin-bottom: 15px; 
-  display: flex; 
-  flex-direction: column; 
-  width: 100%;
-} 
-
-.faq-items{ 
-  display: flex; 
-  flex-direction: column;
-  margin-top: 20px;  
-  width: 100%;
-}
-
-.faq-item { 
-  display: flex;
-  flex-direction: column;
-  border-bottom: 1px solid #ddd;  
-  width: 100%;
-}  
-
-.faq-item-header {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between; 
-} 
-
-.faq-answer-button { 
-  margin-left: auto;
-  font-size: 25px;
-  background-color: transparent; 
-  border: none;
-  cursor: pointer;
-  padding: 2px ;   
-}
-
-.faq-answer-button:hover {
-  color: #007bff;
-} 
-
-@media (max-width: 576px) {
-  .faq ,  
-  .faq-items {
-   flex-direction :column ;
-   align-items:center;
-   text-align: center; 
-   margin: 0 auto; 
- }
-  .faq-item {
-   display:block ;
-   width: 100%;
-   
- }
-}
-/**/
-
-.footer {
-  padding: 20px;
-  text-align: center; 
-  background-color: #FFFFFF;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.footer-items {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.footer-items span {
-  margin: 0 15px;
-  text-decoration: none;
-  font-weight: bold;
-}
-  
