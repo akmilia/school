@@ -216,7 +216,7 @@
 
 @media (max-width: 480px) {
   .headerWrapper {
-    height: 70px; /* Фиксированная высота для самых маленьких экранов */
+    height: 70px; 
   }
   
   .header {

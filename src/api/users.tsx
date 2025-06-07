@@ -14,7 +14,7 @@ class UsersApi {
           }
 
         try {
-            const response = await axios.get(`${base_url}/teachers`, {
+            const response = await axios.get(`${base_url}/api/teachers`, {
                 headers: {
                     Authorization: `Bearer ${access_token}`,
                 },

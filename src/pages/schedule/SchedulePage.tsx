@@ -1,107 +1,87 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
-import HeaderAdmin from "../../components/HeaderAdmin/Header"; 
+import { getScheduleDates, getCommonSchedule, ScheduleEntry } from "../../api/schedule";
+import HeaderAdmin from "../../components/HeaderAdmin/Header";
 import "./SchedulePage.css";
 
-interface ScheduleItem {
-  day_of_week: number;
-  time: string;
-  subject_name: string;
-  group_name?: string;
-  teacher_name?: string;
-  cabinet: string;
-}
+const daysOfWeek = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'];
 
-const SchedulePage = () => {
-  const baseUrl = import.meta.env.VITE_baseUrl;
-  const user_role = localStorage.getItem("user_role");
-  const [isLoading, setIsLoading] = useState(true); 
-  const [error, setError] = useState('');
-  const [schedules, setSchedules] = useState<ScheduleItem[]>([]);
-  const navigate = useNavigate();
-  
-  useEffect(() => {
-    const fetchSchedule = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        const response = await axios.get(`${baseUrl}/api/schedule`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        setSchedules(response.data);
-      } catch (err) {
-        setError('Ошибка при загрузке расписания');
-        console.error(err);
-      } finally {
-        setIsLoading(false);
-      }
+export const SchedulePage = () => {
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState('');
+    const [schedules, setSchedules] = useState<ScheduleEntry[]>([]);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const loadSchedule = async () => {
+            try {
+                const data = await getCommonSchedule();
+                setSchedules(data);
+            } catch (err) {
+                const error = err as Error;
+                setError(error.message || 'Ошибка при загрузке расписания');
+                console.error(error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        loadSchedule();
+    }, []);
+
+    const handleLogout = () => {
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('user_role');
+        navigate('/main');
     };
+     return (
+        <div>
+            <HeaderAdmin />
+            <div className="container">
+                <header className="schedule-header">
+                    <h1>Общее расписание</h1>
+                    <button onClick={handleLogout} className="logout-button">Выйти</button>
+                </header>
 
-    fetchSchedule();
-  }, [baseUrl]);
-
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user_role');
-    navigate('/main');
-  };
-
-  const daysOfWeek = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'];
-
-  return (
-    <div>
-      <HeaderAdmin />
-      <div className="container">
-        <h3>Ваше расписание</h3>
-
-        <div className="schedule-container">
-          <header>
-            <h1>
-              {user_role === '3' ? 'Мое расписание' : 
-               user_role === '2' ? 'Мое преподавательское расписание' : 
-               'Расписание'}
-            </h1>
-            <button onClick={handleLogout} className="logout-button">Выйти</button>
-          </header>
-
-          {isLoading ? (
-            <div>Загрузка расписания...</div>
-          ) : error ? (
-            <div className="error-message">{error}</div>
-          ) : (
-            <div className="schedule-grid">
-              {daysOfWeek.map((day, index) => {
-                const daySchedule = schedules.filter(item => item.day_of_week === index + 1);
-                
-                return (
-                  <div key={day} className="day-column">
-                    <h3>{day}</h3>
-                    {daySchedule.length > 0 ? (
-                      daySchedule.map((lesson, idx) => (
-                        <div key={`${day}-${idx}`} className="schedule-item">
-                          <div className="time">{lesson.time}</div>
-                          <div className="subject">{lesson.subject_name}</div>
-                          {user_role === '2' && lesson.group_name && (
-                            <div className="group">Группа: {lesson.group_name}</div>
-                          )}
-                          {user_role === '3' && lesson.teacher_name && (
-                            <div className="teacher">Преподаватель: {lesson.teacher_name}</div>
-                          )}
-                          <div className="cabinet">Каб. {lesson.cabinet}</div>
-                        </div>
-                      ))
-                    ) : (
-                      <div className="no-classes">Нет занятий</div>
-                    )}
-                  </div>
-                );
-              })}
+                {isLoading ? (
+                    <div className="loading-message">Загрузка расписания...</div>
+                ) : error ? (
+                    <div className="error-message">{error}</div>
+                ) : (
+                    <div className="schedule-container">
+                        {daysOfWeek.map((day, dayIndex) => {
+                            const daySchedule = schedules.filter(
+                                item => item.day_of_week.toLowerCase() === day.toLowerCase()
+                            );
+                            
+                            return (
+                                <div key={day} className="schedule-day">
+                                    <h3>{day}</h3>
+                                    {daySchedule.length > 0 ? (
+                                        daySchedule
+                                            .sort((a, b) => a.time.localeCompare(b.time))
+                                            .map((lesson) => (
+                                                <div key={lesson.idschedule} className="lesson-info">
+                                                    <strong>{lesson.time}</strong>
+                                                    <div>{lesson.subject_name}</div>
+                                                    <div>Преподаватель: {lesson.teacher.full_name}</div>
+                                                    {lesson.group_name && (
+                                                        <div>Группа: {lesson.group_name}</div>
+                                                    )}
+                                                    <div>Кабинет: {lesson.cabinet}</div>
+                                                </div>
+                                            ))
+                                    ) : (
+                                        <div className="no-classes">Нет занятий</div>
+                                    )}
+                                </div>
+                            );
+                        })}
+                    </div>
+                )}
             </div>
-          )}
         </div>
-      </div>
-    </div>
-  );
+    );
 };
 
 export default SchedulePage;

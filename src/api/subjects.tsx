@@ -10,7 +10,7 @@ interface Subject {
  
 interface Group { 
   idgroups: number;
-  name: string
+  name: string;
 }
 
 interface SubjectType {
@@ -63,7 +63,7 @@ export const getTypes = async (): Promise<SubjectType[]> => {
   const access_token = localStorage.getItem('access_token');
   
   try {
-    const response = await axios.get(`${base_url}/types`, {
+    const response = await axios.get(`${base_url}/api/types`, {
       headers: {
         'Authorization': `Bearer ${access_token}`
       }
@@ -85,7 +85,7 @@ export const getGroups = async (): Promise<ApiResponse<ApiGroup[]> | ApiError> =
   try {
     console.log('Making request to:', `${base_url}/groups`);
     
-    const response = await axios.get<ApiGroup[]>(`${base_url}/groups`, {
+    const response = await axios.get<ApiGroup[]>(`${base_url}/api/groups`, {
       headers: {
         'Authorization': `Bearer ${access_token}`,
         'Content-Type': 'application/json'
@@ -128,7 +128,7 @@ export const getSubjects = async (): Promise<ApiResponse<Subject[]> | ApiError> 
 
   try {
     console.log('Making request to:', `${base_url}/subjects`);
-    const response = await axios.get<Subject[]>(`${base_url}/subjects`, {
+    const response = await axios.get<Subject[]>(`${base_url}/api/subjects`, {
       headers: {
         'Authorization': `Bearer ${access_token}`,
         'Content-Type': 'application/json'
@@ -188,7 +188,7 @@ export const handleEnrollGroup = async (idgroups: number) => {
 
   try {
     const response = await axios.post(
-      `${base_url}/enroll/group`,
+      `${base_url}/api//enroll/group`,
       { idgroups }, // Отправляем как объект с полем group_id
       {
         headers: {
