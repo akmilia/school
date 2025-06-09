@@ -5,9 +5,10 @@ import { useAuth } from './context/AuthContext';
 import LendingPage from './pages/lending/LendingPage';
 import ProfilePage from './pages/profile/ProfilePage';
 import SubjectPage from './pages/subject/SubjectPage';
-import SchedulePage from './pages/schedule/SchedulePage';
+import {SchedulePage} from './pages/schedule/SchedulePage';
 import { UsersPage } from './pages/users/UsersPage';
-import LoadingSpinner from './components/LoadingSpinner'; // Создайте этот компонент
+import LoadingSpinner from './components/LoadingSpinner'; 
+import {AttendanceView} from './components/Attendance/AttendanceView'; 
 
 function App() {
   const { user, isInitialized } = useAuth();
@@ -42,7 +43,8 @@ function App() {
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/subjects" element={<SubjectPage />} />
             <Route path="/schedule" element={<SchedulePage />} />
-            <Route path="/users" element={<UsersPage />} />
+            <Route path="/users" element={<UsersPage />} /> 
+            <Route path="/attendance/:idattendance" element={<AttendanceView />} />
           </>
         )}
         <Route index element={<LendingPage />} />

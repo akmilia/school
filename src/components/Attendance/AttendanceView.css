@@ -1,0 +1,77 @@
+/* AttendanceView.css */
+.attendance-container {
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 20px;
+}
+
+.back-button {
+  margin-bottom: 20px;
+  padding: 8px 16px;
+  background-color: #f0f0f0;
+  border: 1px solid #ddd;
+  cursor: pointer;
+}
+
+.attendance-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.attendance-table th, 
+.attendance-table td {
+  padding: 12px;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+
+.attendance-table th {
+  background-color: #f5f5f5;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.action-buttons button {
+  padding: 6px 12px;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.present {
+  background-color: #e6f7e6;
+  color: #2e7d32;
+}
+
+.present.active {
+  background-color: #2e7d32;
+  color: white;
+}
+
+.absent {
+  background-color: #ffebee;
+  color: #c62828;
+}
+
+.absent.active {
+  background-color: #c62828;
+  color: white;
+}
+
+.loading {
+  text-align: center;
+  padding: 20px;
+}
+
+.error {
+  color: #d32f2f;
+  background-color: #ffebee;
+  padding: 20px;
+  text-align: center;
+  border-radius: 4px;
+  margin: 20px;
+}
