@@ -168,29 +168,29 @@ export const SubjectPage = () => {
     };
 
     const handleGroupEnroll = async (groupId: number) => {
-        if (!user || !isStudent) return;
+    if (!user || !isStudent) return;
 
-        try {
-            await handleEnrollGroup(groupId);
-            alert('Вы успешно записаны в группу!');
-            
-            const response = await getGroups();
-            if (response.data) {
-                const updatedGroups = response.data.map((group: any) => ({
-                    idgroups: group.idgroups,
-                    name: group.name
-                }));
-                setGroups(updatedGroups);
-            }
-        } catch (error) {
-            console.error("Ошибка при записи:", error);
-            if (error instanceof Error) {
-                alert(error.message);
-            } else {
-                alert('Ошибка при записи в группу');
-            }
+    try {
+        await handleEnrollGroup(groupId);
+        alert('Вы успешно записаны в группу!');
+        
+        const response = await getGroups();
+        if (response.data) {
+            const updatedGroups = response.data.map((group: any) => ({
+                idgroups: group.idgroups,
+                name: group.name
+            }));
+            setGroups(updatedGroups);
         }
-    };
+    } catch (error) {
+        console.error("Ошибка при записи:", error);
+        // Извлекаем сообщение об ошибке из Error объекта
+        const errorMessage = error instanceof Error 
+            ? error.message 
+            : 'Ошибка при записи в группу';
+        alert(errorMessage);
+    }
+};
 
     if (isLoading) {
         return (

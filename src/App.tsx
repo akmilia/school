@@ -44,7 +44,6 @@ function App() {
             <Route path="/subjects" element={<SubjectPage />} />
             <Route path="/schedule" element={<SchedulePage />} />
             <Route path="/users" element={<UsersPage />} /> 
-            <Route path="/attendance/:idattendance" element={<AttendanceView />} />
           </>
         )}
         <Route index element={<LendingPage />} />

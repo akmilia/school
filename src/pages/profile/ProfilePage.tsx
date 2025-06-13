@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import Header from '../../components/HeaderAdmin/Header';
 import cl from './Profile.module.css';
-import api from '../../api/login';  
+import api from '../../api/login';   
 
 interface UserResponseSchemaBirthdate {
   idusers: number;
@@ -28,6 +28,11 @@ const ProfilePage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
+  const handleLogout = () => {
+    logout();
+    // Дополнительно можно очистить поля формы входа, если она здесь присутствует
+  };
+
   const fetchProfileData = async () => {
     try {
       const [profileResponse, coursesResponse] = await Promise.all([
@@ -129,6 +134,23 @@ const ProfilePage = () => {
                 <p>Нет активных занятий</p>
               )}
             </div>
+          </div>
+        </section> 
+        <section className={cl.profile}>
+          <h1>Дополнительно</h1>
+          <div className={cl.profile_items}>
+                 <button onClick={handleLogout}>Выйти из аккаунта</button> 
+
+            <div style={{ marginTop: '20px' }}>
+            <h2>Документация</h2>
+            <a href="/docs/documentation.pdf" download>
+              Скачать документацию (PDF)
+            </a>
+            <br />
+            <a href="/docs" target="_blank" rel="noopener noreferrer">
+              Открыть документацию онлайн
+            </a>
+          </div>
           </div>
         </section>
       </main>

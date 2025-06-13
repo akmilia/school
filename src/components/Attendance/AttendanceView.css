@@ -1,4 +1,77 @@
-/* AttendanceView.css */
+.date-selector {
+    margin: 20px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.date-selector select {
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+}
+
+.status-indicator {
+    margin-left: 8px;
+}
+
+.status-indicator.present {
+    color: #2e7d32;
+}
+
+.status-indicator.absent {
+    color: #c62828;
+}
+
+.status {
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.status.present {
+    background-color: #e6f7e6;
+    color: #2e7d32;
+}
+
+.status.absent {
+    background-color: #ffebee;
+    color: #c62828;
+}
+
+.status.unknown {
+    background-color: #f5f5f5;
+    color: #616161;
+}
+
+.no-data {
+    text-align: center;
+    padding: 20px;
+    color: #757575;
+}
+
+.save-container {
+    margin-top: 20px;
+    text-align: right;
+}
+
+.save-button {
+    padding: 10px 20px;
+    background-color: #1976d2;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.save-button:disabled {
+    background-color: #b0bec5;
+    cursor: not-allowed;
+}
+
+.action-buttons button {
+    padding: 6px 12px;
+    font-size: 14px;
+}
 .attendance-container {
   max-width: 800px;
   margin: 20px auto;
@@ -74,4 +147,42 @@
   text-align: center;
   border-radius: 4px;
   margin: 20px;
+}
+
+/* Add to your CSS */
+.status-indicator.present {
+  background-color: #d4edda;
+  color: #155724;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-left: 8px;
+}
+
+.status-indicator.absent {
+  background-color: #f8d7da;
+  color: #721c24;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-left: 8px;
+}
+
+.status-indicator.unknown {
+  background-color: #e2e3e5;
+  color: #383d41;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-left: 8px;
+}
+
+.edit-button {
+  margin-left: 10px;
+  padding: 2px 6px;
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.edit-button:hover {
+  background-color: #e0e0e0;
 }

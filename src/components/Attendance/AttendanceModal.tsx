@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { getAttendanceByAttendanceId, updateAttendance, AttendanceRecord, AttendanceModalProps } from '../../api/attendance';
+import axios from 'axios';
 
 export const AttendanceModal = ({ 
   scheduleId, 
@@ -49,21 +50,30 @@ export const AttendanceModal = ({
     }));
   };
 
-  const handleSave = async () => {
+const handleSave = async () => {
     try {
       setIsSaving(true);
       setError(null);
-      // Используем idattendance вместо scheduleId и date
       await updateAttendance(idattendance, updates);
       onSave();
       onClose();
     } catch (error) {
       console.error('Failed to save attendance:', error);
-      setError('Не удалось сохранить изменения');
+      if (axios.isAxiosError(error)) {
+        if (error.response?.status === 400) {
+          setError(error.response.data.detail || 'Invalid date range for attendance');
+        } else if (error.response?.status === 403) {
+          setError('You do not have permission to update this attendance');
+        } else {
+          setError('Failed to save attendance. Please try again.');
+        }
+      } else {
+        setError('An unexpected error occurred');
+      }
     } finally {
       setIsSaving(false);
     }
-  };
+};
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -71,7 +81,7 @@ export const AttendanceModal = ({
         <button className="modal-close" onClick={onClose}>×</button>
         <h2>Посещаемость</h2>
         <h3>Группа: {groupName}</h3>
-        <h4>Дата: {date}</h4> {/* Display as-is without conversion */}
+        <h4>Дата: {date}</h4> {}
         
         {error && <div className="error-message">{error}</div>}
         

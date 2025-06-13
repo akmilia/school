@@ -146,7 +146,7 @@ export const getSubjects = async (): Promise<ApiResponse<Subject[]> | ApiError> 
   }
 };
 
-export const handleEnrollGroup = async (idgroups: number) => {
+export const handleEnrollGroup = async (group_id: number) => {
   const access_token = localStorage.getItem('access_token');
   
   if (!access_token) {
@@ -155,8 +155,8 @@ export const handleEnrollGroup = async (idgroups: number) => {
 
   try {
     const response = await axios.post(
-      `${base_url}/api//enroll/group`,
-      { idgroups }, // Отправляем как объект с полем group_id
+      `${base_url}/api/enroll/group`,
+      { group_id }, // Важно: имя поля должно совпадать с параметром в FastAPI (group_id)
       {
         headers: {
           'Authorization': `Bearer ${access_token}`,
@@ -168,12 +168,13 @@ export const handleEnrollGroup = async (idgroups: number) => {
   } catch (error) {
     if (axios.isAxiosError(error)) {
       if (error.response?.status === 401) {
-        // Очищаем невалидный токен
         localStorage.removeItem('access_token');
         throw new Error('Сессия истекла. Пожалуйста, войдите снова.');
       }
-      throw new Error(error.response?.data?.detail || 'Ошибка сервера');
+      // Извлекаем сообщение об ошибке из response.data.detail
+      const errorMessage = error.response?.data?.detail || 'Ошибка сервера';
+      throw new Error(errorMessage);
     }
     throw new Error('Неизвестная ошибка');
   }
-}; 
+};

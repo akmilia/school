@@ -12,8 +12,6 @@ export interface ScheduleDate {
   date: string; // "YYYY-MM-DD" format
   attendance_status: boolean | null; // User's status if available
 }
-
-// AttendanceModal.tsx props
 export interface AttendanceModalProps {
   scheduleId: number; // For reference
   date: string; // Display only
@@ -22,41 +20,32 @@ export interface AttendanceModalProps {
   onClose: () => void;
   onSave: () => void;
 }
+
 export const getScheduleDates = async (scheduleId: number): Promise<ScheduleDate[]> => {
     const access_token = localStorage.getItem('access_token');
-    const response = await axios.get<ScheduleDate[]>(
-        `${base_url}/api/schedule/${scheduleId}/dates`,
-        {
-            headers: {
-                'Authorization': `Bearer ${access_token}`,
-                'Content-Type': 'application/json'
+    try {
+        const response = await axios.get<ScheduleDate[]>(
+            `${base_url}/api/schedule/${scheduleId}/dates`,
+            {
+                headers: {
+                    'Authorization': `Bearer ${access_token}`,
+                    'Content-Type': 'application/json'
+                }
             }
-        }
-    );
-    return response.data;
-};
-
-export const getAttendanceRecords = async (idattendance: number): Promise<AttendanceRecord[]> => {
-  const access_token = localStorage.getItem('access_token');
-  const response = await axios.get<AttendanceRecord[]>(
-    `${base_url}/api/attendance/${idattendance}/records`,
-    {
-      headers: {
-        'Authorization': `Bearer ${access_token}`,
-        'Content-Type': 'application/json'
-      }
+        );
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching schedule dates:', error);
+        throw error;
     }
-  );
-  return response.data;
 };
 
-// Новый метод для получения записей посещаемости по idattendance
 export const getAttendanceByAttendanceId = async (
   idattendance: number
 ): Promise<AttendanceRecord[]> => {
   const access_token = localStorage.getItem('access_token');
   const response = await axios.get<AttendanceRecord[]>(
-    `${base_url}/api/attendance/by-attendance`,
+    `${base_url}/api/by-attendance`,
     {
       params: { attendance_id: idattendance },
       headers: {
@@ -73,34 +62,29 @@ export const updateAttendance = async (
     updates: Record<number, boolean | null>
 ): Promise<void> => {
     const access_token = localStorage.getItem('access_token');
-    await axios.post(
-        `${base_url}/api/attendance/update`,
-        {
-            idattendance,
-            updates
-        },
-        {
-            headers: {
-                'Authorization': `Bearer ${access_token}`,
-                'Content-Type': 'application/json'
+    
+    // Convert updates to the correct format with numeric keys
+    const formattedUpdates: {[key: string]: boolean | null} = {};
+    Object.keys(updates).forEach(key => {
+        formattedUpdates[key] = updates[parseInt(key)];
+    });
+
+    try {
+        await axios.post(
+            `${base_url}/api/update`, 
+            { 
+                idattendance, 
+                updates: formattedUpdates
+            },
+            {
+                headers: {
+                    'Authorization': `Bearer ${access_token}`,
+                    'Content-Type': 'application/json'
+                }
             }
-        }
-    );
-};
-export const updateAttendanceStatus = async (
-  idattendance: number,
-  iduser: number,
-  status: boolean
-): Promise<void> => {
-  const access_token = localStorage.getItem('access_token');
-  await axios.post(
-    `${base_url}/api/attendance/${idattendance}/status`,
-    { iduser, status },
-    {
-      headers: {
-        'Authorization': `Bearer ${access_token}`,
-        'Content-Type': 'application/json'
-      }
+        );
+    } catch (error) {
+        console.error('Error updating attendance:', error);
+        throw error;
     }
-  );
-}; 
+};
