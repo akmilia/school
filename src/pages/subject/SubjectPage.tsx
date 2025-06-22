@@ -4,6 +4,7 @@ import HeaderAdmin from "../../components/HeaderAdmin/Header";
 import './SubjectPage.css';
 import { Button, Table, Form, Badge, Spinner, Alert } from "react-bootstrap";
 import { AuthContext } from "../../context/AuthContext";
+import { ErrorDisplay } from "../../components/ErrorDisplay";
 
 interface SubjectType {
     id: number;
@@ -96,8 +97,8 @@ export const SubjectPage = () => {
 
             } catch (err) {
                 console.error("Ошибка при загрузке данных:", err);
-                setError('Не удалось загрузить данные. Пожалуйста, попробуйте позже.');
-            } finally {
+                setError('Не удалось загрузить занятия. Пожалуйста, попробуйте позже.');
+            }  finally {
                 setIsLoading(false);
             }
         };
@@ -180,17 +181,34 @@ export const SubjectPage = () => {
                 idgroups: group.idgroups,
                 name: group.name
             }));
-            setGroups(updatedGroups);
+            setGroups(updatedGroups); 
+
+            //  const response = await handleEnrollGroup(groupId);
+            
+            // // Обновляем список групп
+            // const groupsResponse = await getGroups();
+            // if (groupsResponse.data) {
+            //     const updatedGroups = groupsResponse.data.map((group: any) => ({
+            //         idgroups: group.idgroups,
+            //         name: group.name
+            //     }));
+            //     setGroups(updatedGroups);
+         }
+        }  
+        catch (error) {
+            console.error("Ошибка при записи:", error);
+            const errorMessage = error instanceof Error 
+                ? error.message 
+                : 'Произошла ошибка при записи в группу. Пожалуйста, попробуйте позже.';
+            alert(errorMessage);
         }
-    } catch (error) {
-        console.error("Ошибка при записи:", error);
-        // Извлекаем сообщение об ошибке из Error объекта
-        const errorMessage = error instanceof Error 
-            ? error.message 
-            : 'Ошибка при записи в группу';
-        alert(errorMessage);
-    }
-};
+    }; 
+
+    const sendEnrollmentEmail = async (email: string, groupId: number) => {
+        // В реальном приложении здесь будет вызов API для отправки email
+        console.log(`Отправка email на ${email} о записи в группу ${groupId}`);
+        return new Promise((resolve) => setTimeout(resolve, 1000));
+    }; 
 
     if (isLoading) {
         return (
@@ -204,9 +222,10 @@ export const SubjectPage = () => {
 
     if (error) {
         return (
-            <Alert variant="danger" className="m-3">
-                {error}
-            </Alert>
+            <div>
+                <HeaderAdmin />
+                <ErrorDisplay error={error} />
+            </div>
         );
     }
 
@@ -220,16 +239,15 @@ export const SubjectPage = () => {
                     <Form.Group className="filter-group">
                         <Form.Label>Фильтр по типу:</Form.Label>
                         <Form.Select
-                            value={selectedType}
-                            onChange={(e) => setSelectedType(e.target.value === 'all' ? 'all' : Number(e.target.value))}
-                        >
-                            <option value="all">Все типы</option>
-                            {types.map(type => (
-                                <option key={type.id} value={type.id}>
-                                    {type.type}
-                                </option>
-                            ))}
-                        </Form.Select>
+                        value={selectedType}
+                        onChange={(e) => setSelectedType(Number(e.target.value))} //Simplified onChange
+                    >
+                        {types.map(type => (
+                            <option key={type.id} value={type.id}>
+                                {type.type}
+                            </option>
+                        ))}
+                    </Form.Select>
                     </Form.Group>
         
                     <div className="sorting-controls">

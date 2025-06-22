@@ -30,7 +30,33 @@ class UsersApi {
             }
             throw error;
         }
+    } 
+
+    public static getTeachersWithSubjects = async () => {
+    const access_token = localStorage.getItem('access_token');
+    
+    if (!access_token) {
+        return [];
     }
+
+    try {
+        const response = await axios.get(`${base_url}/api/teachers-with-subjects`, {
+            headers: {
+                Authorization: `Bearer ${access_token}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        if (axios.isAxiosError(error)) {
+            if (error.response?.status === 403) {
+                localStorage.clear();
+                window.location.href = '/main';
+            }
+            throw new Error(error.response?.data?.detail || 'Ошибка получения данных');
+        }
+        throw error;
+    }
+}
 }
 
 export default UsersApi;

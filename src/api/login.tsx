@@ -79,7 +79,20 @@ export const authService = {
 
   async logout(): Promise<void> {
     try {
-      await api.post('/api/logout');
+      await api.post('/api/logout'); 
+      // В вашем api.ts
+    api.interceptors.response.use(
+      response => response,
+      error => {
+        if (error.response?.status === 401) {
+          // Автоматический выход при 401 ошибке
+          if (window.location.pathname !== '/login') {
+            window.location.href = '/login';
+          }
+        }
+        return Promise.reject(error);
+      }
+);
     } catch (error) {
       console.warn('Logout error:', error);
     }

@@ -21,8 +21,28 @@ export interface AttendanceModalProps {
   onSave: () => void;
 }
 
+// export const getScheduleDates = async (scheduleId: number): Promise<ScheduleDate[]> => {
+//     const access_token = localStorage.getItem('access_token');
+//     try {
+//         const response = await axios.get<ScheduleDate[]>(
+//             `${base_url}/api/schedule/${scheduleId}/dates`,
+//             {
+//                 headers: {
+//                     'Authorization': `Bearer ${access_token}`,
+//                     'Content-Type': 'application/json'
+//                 }
+//             }
+//         );
+//         return response.data;
+//     } catch (error) {
+//         console.error('Error fetching schedule dates:', error);
+//         throw error;
+//     }
+// };
+
 export const getScheduleDates = async (scheduleId: number): Promise<ScheduleDate[]> => {
     const access_token = localStorage.getItem('access_token');
+    console.log('Fetching dates for schedule:', scheduleId); // Добавьте это
     try {
         const response = await axios.get<ScheduleDate[]>(
             `${base_url}/api/schedule/${scheduleId}/dates`,
@@ -33,6 +53,7 @@ export const getScheduleDates = async (scheduleId: number): Promise<ScheduleDate
                 }
             }
         );
+        console.log('Received dates:', response.data); // И это
         return response.data;
     } catch (error) {
         console.error('Error fetching schedule dates:', error);

@@ -28,11 +28,18 @@ const ProfilePage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
-  const handleLogout = () => {
+const handleLogout = async () => {
+  if (!window.confirm('Вы уверены, что хотите выйти?')) {
+    return;
+  }
+  try {
+    await api.post('/api/logout');
     logout();
-    // Дополнительно можно очистить поля формы входа, если она здесь присутствует
-  };
-
+  } catch (err) {
+    console.error('Logout failed:', err);
+    logout();
+  }
+};
   const fetchProfileData = async () => {
     try {
       const [profileResponse, coursesResponse] = await Promise.all([
@@ -136,23 +143,24 @@ const ProfilePage = () => {
             </div>
           </div>
         </section> 
-        <section className={cl.profile}>
-          <h1>Дополнительно</h1>
-          <div className={cl.profile_items}>
-                 <button onClick={handleLogout}>Выйти из аккаунта</button> 
-
-            <div style={{ marginTop: '20px' }}>
+        <section className={cl.additional_section}>
+        <h1>Дополнительно</h1>
+        <div className={cl.additional_actions}>
+          <button className={cl.logout_btn} onClick={handleLogout}>
+            Выйти из аккаунта
+          </button>
+          
+          <div className={cl.docs_links}>
             <h2>Документация</h2>
-            <a href="/docs/documentation.pdf" download>
+            <a href="/src/apps/руководство.pdf" download>
               Скачать документацию (PDF)
             </a>
-            <br />
-            <a href="/docs" target="_blank" rel="noopener noreferrer">
+            <a href="https://newschool.gitbook.io/newschool-docs" target="_blank" rel="noopener noreferrer">
               Открыть документацию онлайн
             </a>
           </div>
-          </div>
-        </section>
+        </div>
+      </section>
       </main>
     </div>
   );

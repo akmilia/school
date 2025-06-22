@@ -15,6 +15,7 @@ export const AttendanceModal = ({
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   
   useEffect(() => {
     const loadData = async () => {
@@ -51,28 +52,34 @@ export const AttendanceModal = ({
   };
 
 const handleSave = async () => {
-    try {
-      setIsSaving(true);
-      setError(null);
-      await updateAttendance(idattendance, updates);
+  try {
+    setIsSaving(true);
+    setError(null);
+    await updateAttendance(idattendance, updates);
+    setSuccessMessage('Изменения посещаемости успешно сохранены');
+    
+    // Через 3 секунды закрываем модальное окно
+    setTimeout(() => {
       onSave();
       onClose();
-    } catch (error) {
-      console.error('Failed to save attendance:', error);
-      if (axios.isAxiosError(error)) {
-        if (error.response?.status === 400) {
-          setError(error.response.data.detail || 'Invalid date range for attendance');
-        } else if (error.response?.status === 403) {
-          setError('You do not have permission to update this attendance');
-        } else {
-          setError('Failed to save attendance. Please try again.');
-        }
+    }, 3000);
+    
+  } catch (error) {
+    console.error('Failed to save attendance:', error);
+    if (axios.isAxiosError(error)) {
+      if (error.response?.status === 400) {
+        setError(error.response.data.detail || 'Неправильный диапазон дат');
+      } else if (error.response?.status === 403) {
+        setError('У вас нет прав доступа, позволяющих редактировать посещаемость');
       } else {
-        setError('An unexpected error occurred');
+        setError('Возникла ошибка при сохранении, пожалуйста, попробуйте позднее');
       }
-    } finally {
-      setIsSaving(false);
+    } else {
+      setError('Возникла неизвестная ошибка , пожалуйста, попробуйте позднее.');
     }
+  } finally {
+    setIsSaving(false);
+  }
 };
 
   return (
@@ -84,6 +91,17 @@ const handleSave = async () => {
         <h4>Дата: {date}</h4> {}
         
         {error && <div className="error-message">{error}</div>}
+        {successMessage && (
+          <div className="success-message" style={{
+            color: 'green',
+            padding: '10px',
+            margin: '10px 0',
+            backgroundColor: '#f0fff0',
+            borderRadius: '4px'
+          }}>
+            {successMessage}
+          </div>
+        )}
         
         {isLoading ? (
           <div className="loading">Загрузка данных...</div>

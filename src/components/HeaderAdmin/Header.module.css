@@ -33,7 +33,7 @@
   font-size: 36px;
   font-weight: 700;
   color: #000;
-  transition: opacity 0.3s;
+  transition: opacity 0.3s ease;
 }
 
 .headerTitle a {
@@ -139,6 +139,7 @@
 @media (max-width: 1024px) {
   .header {
     padding: 20px;
+     font-size: 32px;
   }
 }
 
@@ -149,7 +150,7 @@
   }
 
   .headerTitle {
-    font-size: 28px;
+    font-size: 24px;
   }
 
   .navLink {
@@ -169,7 +170,15 @@
   .headerTitle {
     opacity: 0;
     position: absolute;
-    pointer-events: none;
+    pointer-events: none; 
+    font-size: 0;
+    transition: none; 
+  }
+  
+  .headerTitle::after {
+    content: "НШ";
+    font-size: 24px;
+    opacity: 1;
   }
 
   .menuButton {
@@ -231,4 +240,18 @@
   .navLink {
     font-size: 16px;
   }
+}
+
+.notificationBtn {
+  position: relative;
+}
+
+.notificationBadge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 10px;
+  height: 10px;
+  background-color: red;
+  border-radius: 50%;
 }

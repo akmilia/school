@@ -6,8 +6,8 @@ import {
     ScheduleEntry,
     PersonalScheduleEntry 
 } from "../../api/schedule";
-import { getScheduleDates, ScheduleDate, updateAttendance, AttendanceModalProps } from "../../api/attendance"; 
-import { AttendanceModal} from "../../components/Attendance/AttendanceModal";
+import { getScheduleDates, ScheduleDate } from "../../api/attendance";
+import { AttendanceModal } from "../../components/Attendance/AttendanceModal";
 import HeaderAdmin from "../../components/HeaderAdmin/Header";
 import "./SchedulePage.css";
 
@@ -20,49 +20,46 @@ export const SchedulePage = () => {
     const [personalSchedules, setPersonalSchedules] = useState<PersonalScheduleEntry[]>([]);
     const [activeTab, setActiveTab] = useState<'common' | 'personal'>('common');
     const [selectedSchedule, setSelectedSchedule] = useState<number | null>(null);
-    const [attendanceDates, setAttendanceDates] = useState<ScheduleDate[]>([]); 
-    const [expandedLessons, setExpandedLessons] = useState<Record<number, boolean>>({}); 
+    const [attendanceDates, setAttendanceDates] = useState<ScheduleDate[]>([]);
     const [modalData, setModalData] = useState<{
-            date: string;
-            groupName: string;
-            idattendance: number; 
-        } | null>(null);
-    const navigate = useNavigate(); 
+        date: string;
+        groupName: string;
+        idattendance: number;
+    } | null>(null);
+    const [expandedLessons, setExpandedLessons] = useState<Record<number, boolean>>({});
     const [userRole, setUserRole] = useState<string>('');
     const currentDayOfWeek = new Date().getDay() - 1;
     const currentDayName = daysOfWeek[currentDayOfWeek >= 0 ? currentDayOfWeek : 6];
-    
+    const isStudent = userRole === 'Ученик';
+
     useEffect(() => {
-    const loadSchedules = async () => {
-        try {
-            setIsLoading(true);
-            setError(null);
-            
-            const commonData = await getCommonSchedule();
-            setCommonSchedules(commonData);
-            
-            // Only load personal schedule if user is teacher or student
-            const role = localStorage.getItem('user_role');
-            if (role === 'Преподаватель' || role === 'Ученик') {
-                const personalData = await getPersonalSchedule();
-                setPersonalSchedules(personalData);
+        const loadSchedules = async () => {
+            try {
+                setIsLoading(true);
+                setError(null);
+                
+                const commonData = await getCommonSchedule();
+                setCommonSchedules(commonData);
+                
+                const role = localStorage.getItem('user_role');
+                setUserRole(role || '');
+                
+                if (role === 'Преподаватель' || role === 'Ученик') {
+                    const personalData = await getPersonalSchedule();
+                    setPersonalSchedules(personalData);
+                }
             }
-        } catch (err) {
-            setError(err instanceof Error ? err.message : 'Unknown error');
-        } finally {
-            setIsLoading(false);
-        }
-    };
+            catch (error) {
+            console.error("Ошибка при получении расписания:", error);
+            setError("Не удалось загрузить расписание. Пожалуйста, попробуйте позже.");
+            }
+            finally {
+                setIsLoading(false);
+            }
+        };
 
-    loadSchedules();
-}, []);
-
-    
-    useEffect(() => {
-      const role = localStorage.getItem('user_role'); // Or get it from your auth context
-      setUserRole(role || '');
+        loadSchedules();
     }, []);
-
 
     const handleScheduleClick = async (scheduleId: number) => {
         try {
@@ -73,28 +70,29 @@ export const SchedulePage = () => {
             console.error("Failed to fetch attendance dates:", error);
             setAttendanceDates([]);
         }
-    };  
-
-    const handleDateClick = (dateItem: ScheduleDate, groupName: string) => {
-    setModalData({ 
-        date: dateItem.date, 
-        groupName,
-        idattendance: dateItem.idattendance // Добавляем idattendance
-    });
     };
-    
-    const handleSaveAttendance = async (updates: Record<number, boolean | null>) => {
-    if (!modalData) return;
-    
-    try {
-        await updateAttendance(modalData.idattendance, updates);
-        // Обновляем данные после сохранения
-        const dates = await getScheduleDates(selectedSchedule!);
-        setAttendanceDates(dates);
-    } catch (error) {
-        console.error('Failed to save attendance:', error);
-    }
-    }; 
+
+    const handleDateClick = (dateItem: ScheduleDate, groupName: string, e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (!isStudent) {
+            setModalData({ 
+                date: dateItem.date, 
+                groupName,
+                idattendance: dateItem.idattendance
+            });
+        }
+    };
+
+    const toggleLesson = (scheduleId: number) => {
+        setExpandedLessons(prev => ({
+            ...prev,
+            [scheduleId]: !prev[scheduleId]
+        }));
+        
+        if (!expandedLessons[scheduleId]) {
+            handleScheduleClick(scheduleId);
+        }
+    };
 
     const getDaySchedule = (dayName: string, schedules: (ScheduleEntry | PersonalScheduleEntry)[]) => {
         return schedules
@@ -102,108 +100,44 @@ export const SchedulePage = () => {
             .sort((a, b) => a.time.localeCompare(b.time));
     };
 
+    const renderCommonSchedule = () => {
+        return (
+            <div className="schedule-container">
+                {daysOfWeek.map((day: string) => {
+                    const dayLessons = getDaySchedule(day, commonSchedules);
+                    return (
+                        <div className={`schedule-day ${day === currentDayName ? 'current-day' : ''}`} key={day}>
+                            <h3>{day}</h3>
+                            {dayLessons.length > 0 ? (
+                                dayLessons.map(lesson => (
+                                    <div key={lesson.idschedule} className="lesson-info">
+                                        <strong>{lesson.time}</strong>
+                                        <div>{lesson.subject_name}</div>
+                                        <div>Преподаватель: {lesson.teacher}</div>
+                                        <div>Группа: {lesson.group_nam}</div>
+                                        <div>Кабинет: {lesson.cabinet}</div>
+                                    </div>
+                                ))
+                            ) : (
+                                <div className="no-classes">Нет занятий</div>
+                            )}
+                        </div>
+                    );
+                })}
+            </div>
+        );
+    };
 
-const toggleLesson = (scheduleId: number) => {
-  setExpandedLessons(prev => ({
-    ...prev,
-    [scheduleId]: !prev[scheduleId]
-  }));
-  
-  if (!expandedLessons[scheduleId]) {
-    handleScheduleClick(scheduleId);
-  }
-};
-// const renderSchedule = (schedules: (ScheduleEntry | PersonalScheduleEntry)[], isPersonal: boolean) => {
-//   return (
-//     <div className="schedule-container">
-//       {daysOfWeek.map((day: string) => {
-//         const dayLessons = getDaySchedule(day, schedules);
-//         return (
-//           <div className={`schedule-day ${day === currentDayName ? 'current-day' : ''}`} key={day}>
-//             <h3>{day}</h3>
-//             {dayLessons.length > 0 ? (
-//               dayLessons.map(lesson => (
-//                 isPersonal ? (
-//                   // Персональное расписание с аккордеоном
-//                   <div key={lesson.idschedule} className="lesson-container">
-//                     <div 
-//                       className="lesson-header"
-//                       onClick={() => toggleLesson(lesson.idschedule)}
-//                     >
-//                       <div className="lesson-time">{lesson.time}</div>
-//                       <div className="lesson-subject">{lesson.subject_name}</div>
-//                       <div className="lesson-toggle">
-//                         {expandedLessons[lesson.idschedule] ? '▲' : '▼'}
-//                       </div>
-//                     </div>
-                    
-//                     {expandedLessons[lesson.idschedule] && (
-//                       <div className="lesson-details">
-//                         <div>Преподаватель: {lesson.teacher}</div>
-//                         <div>Группа: {lesson.group_nam}</div>
-//                         <div>Кабинет: {lesson.cabinet}</div>
-                        
-//                         <div className="attendance-dates">
-//                           <h4>Даты посещаемости:</h4>
-//                         {attendanceDates.length > 0 ? (
-//                             <ul className="dates-list">
-//                               {attendanceDates.map(dateItem => (
-//                                     <li 
-//                                         key={dateItem.date} 
-//                                         className="clickable-date"
-//                                         onClick={() => handleDateClick(dateItem, lesson.group_nam)}
-//                                     >
-//                                         {dateItem.date} {/* Display as-is without conversion */}
-//                                         {dateItem.attendance_status !== null && (
-//                                             <span className={`status ${dateItem.attendance_status ? 'present' : 'absent'}`}>
-//                                                 {dateItem.attendance_status ? '✓' : '✗'}
-//                                             </span>
-//                                         )}
-//                                     </li>
-//                                 ))}
-//                             </ul>
-//                             ) : (
-//                             <div className="no-dates">Нет данных о посещаемости</div>
-//                             )}
-//                         </div>
-//                       </div>
-//                     )}
-//                   </div>
-//                 ) : (
-//                   // Общее расписание в простых карточках
-//                   <div key={lesson.idschedule} className="lesson-info">
-//                     <strong>{lesson.time}</strong>
-//                     <div>{lesson.subject_name}</div>
-//                     <div>Преподаватель: {lesson.teacher}</div>
-//                     <div>Группа: {lesson.group_nam}</div>
-//                     <div>Кабинет: {lesson.cabinet}</div>
-//                   </div>
-//                 )
-//               ))
-//             ) : (
-//               <div className="no-classes">Нет занятий</div>
-//             )}
-//           </div>
-//         );
-//       })}
-//     </div>
-//   );
-// }; 
-
-  const renderSchedule = (schedules: (ScheduleEntry | PersonalScheduleEntry)[], isPersonal: boolean) => {
-    const role = localStorage.getItem('user_role');
-    const isStudent = role === 'Ученик';
-    
-    return (
-        <div className="schedule-container">
-            {daysOfWeek.map((day: string) => {
-                const dayLessons = getDaySchedule(day, schedules);
-                return (
-                    <div className={`schedule-day ${day === currentDayName ? 'current-day' : ''}`} key={day}>
-                        <h3>{day}</h3>
-                        {dayLessons.length > 0 ? (
-                            dayLessons.map(lesson => (
-                                isPersonal ? (
+    const renderPersonalSchedule = () => {
+        return (
+            <div className="schedule-container">
+                {daysOfWeek.map((day: string) => {
+                    const dayLessons = getDaySchedule(day, personalSchedules);
+                    return (
+                        <div className={`schedule-day ${day === currentDayName ? 'current-day' : ''}`} key={day}>
+                            <h3>{day}</h3>
+                            {dayLessons.length > 0 ? (
+                                dayLessons.map(lesson => (
                                     <div key={lesson.idschedule} className="lesson-container">
                                         <div 
                                             className="lesson-header"
@@ -211,9 +145,7 @@ const toggleLesson = (scheduleId: number) => {
                                         >
                                             <div className="lesson-time">{lesson.time}</div>
                                             <div className="lesson-subject">{lesson.subject_name}</div>
-                                            {isStudent && lesson.group_nam && (
-                                                <div className="lesson-group">{lesson.group_nam}</div>
-                                            )}
+                                            {isStudent && <div className="lesson-group">{lesson.group_nam}</div>}
                                             <div className="lesson-toggle">
                                                 {expandedLessons[lesson.idschedule] ? '▲' : '▼'}
                                             </div>
@@ -225,72 +157,54 @@ const toggleLesson = (scheduleId: number) => {
                                                 {!isStudent && <div>Группа: {lesson.group_nam}</div>}
                                                 <div>Кабинет: {lesson.cabinet}</div>
                                                 
-                                                {isStudent && (
-                                                    <div className="attendance-dates">
-                                                        <h4>Даты занятий:</h4>
-                                                        {attendanceDates.length > 0 ? (
-                                                            <ul className="dates-list">
-                                                                {attendanceDates.length > 0 ? (
-    <ul className="dates-list">
-        {attendanceDates.map(dateItem => (
-            <li key={dateItem.date}>
-                <span className="date-text">{dateItem.date}</span>
-                <span className={`status-indicator ${
-                    dateItem.attendance_status === true ? 'present' :
-                    dateItem.attendance_status === false ? 'absent' : 'unknown'
-                }`}>
-                    {userRole === 'Ученик' ? (
-                        dateItem.attendance_status === true ? 'Присутствовал' :
-                        dateItem.attendance_status === false ? 'Отсутствовал' : 'Не указано'
-                    ) : (
-                        dateItem.attendance_status !== null ? (
-                            dateItem.attendance_status ? '✓ Присутствия есть' : '✗ Есть отсутствия'
-                        ) : 'Нет отметок'
-                    )}
-                </span>
-                {userRole !== 'Ученик' && (
-                    <button 
-                        className="edit-button"
-                        onClick={() => handleDateClick(dateItem, lesson.group_nam)}
-                    >
-                        Изменить
-                    </button>
-                )}
-            </li>
-        ))}
-    </ul>
-) : (
-    <div className="no-dates">Нет данных о занятиях</div>
-)}
-                                                            </ul>
-                                                        ) : (
-                                                            <div className="no-dates">Нет данных о занятиях</div>
-                                                        )}
-                                                    </div>
-                                                )}
+                                                <div className="attendance-dates">
+                                                    <h4>Даты занятий:</h4>
+                                                 {attendanceDates.length > 0 ? (
+                                        <ul className="dates-list">
+                                            {attendanceDates.map(dateItem => (
+                                                <li key={dateItem.date} className={isStudent ? "date-item" : "clickable-date"}>
+                                                    <span className="date-text">{dateItem.date}</span>
+                                                    
+                                                    {isStudent && (
+                                                        <span className={`status-indicator ${
+                                                            dateItem.attendance_status === true ? 'present' :
+                                                            dateItem.attendance_status === false ? 'absent' : 'unknown'
+                                                        }`}>
+                                                            {dateItem.attendance_status === true ? '✓' :
+                                                             dateItem.attendance_status === false ? '✗' : '?'}
+                                                        </span>
+                                                    )}
+                                                    
+                                                    {!isStudent && (
+                                                        <button 
+                                                            className="edit-button"
+                                                            onClick={(e) => handleDateClick(dateItem, lesson.group_nam, e)}
+                                                        >
+                                                            Изменить
+                                                        </button>
+                                                    )}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    ) : (
+                                        <div className="no-dates">Нет данных о занятиях</div>
+                                    )}
+
+                                                </div>
                                             </div>
                                         )}
                                     </div>
-                                ) : (
-                                    // Common schedule view remains the same
-                                    <div key={lesson.idschedule} className="lesson-info">
-                                        <strong>{lesson.time}</strong>
-                                        <div>{lesson.subject_name}</div>
-                                        <div>Преподаватель: {lesson.teacher}</div>
-                                        <div>Группа: {lesson.group_nam}</div>
-                                        <div>Кабинет: {lesson.cabinet}</div>
-                                    </div>
-                                )
-                            ))
-                        ) : (
-                            <div className="no-classes">Нет занятий</div>
-                        )}
-                    </div>
-                );
-            })}
-        </div>
-    );
-};
+                                ))
+                            ) : (
+                                <div className="no-classes">Нет занятий</div>
+                            )}
+                        </div>
+                    );
+                })}
+            </div>
+        );
+    };
+
     return (
         <div>
             <HeaderAdmin />
@@ -319,20 +233,19 @@ const toggleLesson = (scheduleId: number) => {
                 ) : (
                     <>
                         {activeTab === 'common' 
-                        ? renderSchedule(commonSchedules, false)
-                        : renderSchedule(personalSchedules, true)}
+                            ? renderCommonSchedule()
+                            : renderPersonalSchedule()}
                     </>
-                )} 
-                 {modalData && (
+                )}
+                
+                {modalData && (
                     <AttendanceModal
                         scheduleId={selectedSchedule!}
                         date={modalData.date}
                         groupName={modalData.groupName}
                         idattendance={modalData.idattendance}
                         onClose={() => setModalData(null)}
-                        onSave={() => {
-                            handleScheduleClick(selectedSchedule!);
-                        }}
+                        onSave={() => handleScheduleClick(selectedSchedule!)}
                     />
                 )}
             </div>

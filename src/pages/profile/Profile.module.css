@@ -1,3 +1,11 @@
+:root {
+  --primary-color: #1976d2;
+  --primary-hover: #1565c0;
+  --error-color: #f44336;
+  --error-bg: #ffebee;
+  --transition: all 0.3s ease;
+}
+
 .error-container {
   width: 100%;
   min-height: 60vh;
@@ -139,4 +147,50 @@ section {
 
 .profile_item:hover {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+} 
+
+/* Добавьте в Profile.module.css */
+.additional_section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.additional_actions {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.logout_btn {
+  padding: 10px 20px;
+  background-color: var(--error-color);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: var(--transition);
+  align-self: flex-start;
+}
+
+.logout_btn:hover {
+  background-color: #d32f2f;
+  transform: scale(1.02);
+}
+
+.docs_links {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.docs_links a {
+  color: var(--primary-color);
+  text-decoration: none;
+  transition: var(--transition);
+}
+
+.docs_links a:hover {
+  color: var(--primary-hover);
+  text-decoration: underline;
 }

@@ -4,13 +4,28 @@ import Bell from '../../assets/bell.png';
 import Profile from '../../assets/Profile.png';
 import MenuIcon from '../../assets/menu.png';
 import CloseIcon from '../../assets/close.png';
+import NotificationsModal from '../Notification/NotificationModal';
 import { Link, useNavigate } from 'react-router-dom';
+
+
+interface Notification {
+  id: number;
+  message: string;
+  read: boolean;
+} 
 
 const HeaderAdmin = () => {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
+   const [notifications, setNotifications] = useState<Notification[]>([
+    {
+      id: 1,
+      message: 'Вы успешно записаны в группу "Математика"',
+      read: false,
+    },
+  ]);
 
-  // Блокировка прокрутки при открытом меню
   useEffect(() => {
     if (isMenuOpen) {
       document.body.style.overflow = 'hidden';
@@ -25,7 +40,6 @@ const HeaderAdmin = () => {
 
   return (
     <>
-      {/* Затемнение фона */}
       {isMenuOpen && <div className={cl.overlay} onClick={toggleMenu} />}
       
       <header className={cl.headerWrapper}>
@@ -36,7 +50,6 @@ const HeaderAdmin = () => {
             </h1>
           </div>
 
-          {/* Кнопка меню для мобильных */}
           <button className={cl.menuButton} onClick={toggleMenu}>
             <img 
               src={isMenuOpen ? CloseIcon : MenuIcon} 
@@ -54,9 +67,19 @@ const HeaderAdmin = () => {
           </nav>
 
           <div className={cl.headerRight}>
-            <button className={cl.notificationBtn}>
+            <button 
+              className={cl.notificationBtn}
+              onClick={() => setShowNotifications(true)}
+            >
               <img src={Bell} alt="Уведомления" className={cl.icon} />
+              {notifications.some(n => !n.read) && (
+                <span className={cl.notificationBadge}></span>
+              )}
             </button>
+
+            {showNotifications && (
+              <NotificationsModal onClose={() => setShowNotifications(false)} />
+            )}
             <button
               className={cl.profileBtn}
               onClick={() => navigate('/profile')}
